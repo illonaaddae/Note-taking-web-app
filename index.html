@@ -1,33 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-  
-  <title>Frontend Mentor | Note-taking web app</title>
-</head>
-<body>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/themes.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+    <link rel="stylesheet" href="./styles/dashboard.css" />
 
-  All Notes
-  Archived Notes
-  Tags
+    <title>Frontend Mentor | Note-taking web app</title>
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- ===== LEFT SIDEBAR ===== -->
+      <aside class="sidebar">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+          <img src="./assets/images/logo.svg" alt="Notes app logo" />
+        </div>
 
-  <!-- Page title -->
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" data-page="all-notes">
+            <img src="./assets/images/icon-home.svg" alt="" class="nav-icon" />
+            <span>All Notes</span>
+            <img
+              src="./assets/images/icon-chevron-right.svg"
+              alt=""
+              class="nav-arrow"
+            />
+          </a>
+          <a href="#" class="nav-item" data-page="archived">
+            <img
+              src="./assets/images/icon-archive.svg"
+              alt=""
+              class="nav-icon"
+            />
+            <span>Archived Notes</span>
+          </a>
+        </nav>
 
-  Search by title, content, or tags
+        <!-- Tags Section -->
+        <div class="sidebar-tags">
+          <h3 class="tags-title">Tags</h3>
+          <ul class="tags-list" id="sidebar-tags">
+            <!-- Tags will be dynamically populated -->
+          </ul>
+        </div>
+      </aside>
 
-  Create New Note
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+          <h1 class="page-title" id="page-title">All Notes</h1>
 
-  Tags
-  Last Edited
+          <!-- Search & Settings (Desktop) -->
+          <div class="header-actions">
+            <div class="search-box">
+              <img
+                src="./assets/images/icon-search.svg"
+                alt=""
+                class="search-icon"
+              />
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search by title, content, or tags..."
+              />
+            </div>
+            <button class="btn-icon" id="settings-btn" aria-label="Settings">
+              <img src="./assets/images/icon-settings.svg" alt="" />
+            </button>
+          </div>
+        </header>
 
-  Archive Note
-  Delete Note
+        <!-- Content Area -->
+        <div class="content-area">
+          <!-- Notes List Column -->
+          <section class="notes-list-section">
+            <!-- Create New Note Button -->
+            <button
+              class="btn btn-primary btn-create-note"
+              id="create-note-btn"
+            >
+              <img src="./assets/images/icon-plus.svg" alt="" />
+              <span>Create New Note</span>
+            </button>
 
-  Save Note
-  Cancel
+            <!-- Notes List -->
+            <div class="notes-list" id="notes-list">
+              <!-- Notes will be dynamically populated -->
+            </div>
+          </section>
 
-</body>
+          <!-- Note Detail/Editor Column -->
+          <section class="note-detail-section" id="note-detail">
+            <!-- Note Header -->
+            <div class="note-header">
+              <h2 class="note-title" id="note-title" contenteditable="true">
+                Select a note to view
+              </h2>
+            </div>
+
+            <!-- Note Meta -->
+            <div class="note-meta">
+              <div class="meta-item">
+                <img
+                  src="./assets/images/icon-tag.svg"
+                  alt=""
+                  class="meta-icon"
+                />
+                <span class="meta-label">Tags</span>
+                <input
+                  type="text"
+                  class="meta-input"
+                  id="note-tags"
+                  placeholder="Add tags (comma separated)"
+                />
+              </div>
+              <div class="meta-item">
+                <img
+                  src="./assets/images/icon-clock.svg"
+                  alt=""
+                  class="meta-icon"
+                />
+                <span class="meta-label">Last edited</span>
+                <span class="meta-value" id="note-date">-</span>
+              </div>
+            </div>
+
+            <!-- Note Content -->
+            <div class="note-content">
+              <textarea
+                id="note-content"
+                placeholder="Start writing your note..."
+              ></textarea>
+            </div>
+
+            <!-- Note Actions -->
+            <div class="note-actions">
+              <button class="btn btn-primary" id="save-note-btn">
+                Save Note
+              </button>
+              <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+            </div>
+          </section>
+
+          <!-- Note Actions Sidebar (Desktop) -->
+          <aside class="note-actions-sidebar" id="note-actions-sidebar">
+            <button class="btn btn-action" id="archive-note-btn">
+              <img src="./assets/images/icon-archive.svg" alt="" />
+              <span>Archive Note</span>
+            </button>
+            <button class="btn btn-action" id="delete-note-btn">
+              <img src="./assets/images/icon-delete.svg" alt="" />
+              <span>Delete Note</span>
+            </button>
+          </aside>
+        </div>
+      </main>
+
+      <!-- ===== MOBILE BOTTOM NAV ===== -->
+      <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item active" data-page="all-notes">
+          <img src="./assets/images/icon-home.svg" alt="" />
+          <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="search">
+          <img src="./assets/images/icon-search.svg" alt="" />
+          <span>Search</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="archived">
+          <img src="./assets/images/icon-archive.svg" alt="" />
+          <span>Archived</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="tags">
+          <img src="./assets/images/icon-tag.svg" alt="" />
+          <span>Tags</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="settings">
+          <img src="./assets/images/icon-settings.svg" alt="" />
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- ===== MOBILE FAB (Floating Action Button) ===== -->
+      <button class="fab" id="fab-create-note" aria-label="Create new note">
+        <img src="./assets/images/icon-plus.svg" alt="" />
+      </button>
+    </div>
+
+    <!-- Appwrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@17.0.0"></script>
+    <script type="module" src="./scripts/main.js"></script>
+  </body>
 </html>

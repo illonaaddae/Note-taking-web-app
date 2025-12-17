@@ -1,31 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-  
-  <title>Frontend Mentor | Note-taking web app</title>
-</head>
-<body>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="../assets/images/favicon-32x32.png"
+    />
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="../styles/base.css" />
+    <link rel="stylesheet" href="../styles/themes.css" />
+    <link rel="stylesheet" href="../styles/components.css" />
+    <link rel="stylesheet" href="../styles/auth.css" />
 
-  Create Your Account
-  Sign up to start organizing your notes and boost your productivity.
+    <title>Frontend Mentor | Note-taking web app</title>
+  </head>
+  <body>
+    <main class="auth-layout">
+      <section class="auth-card">
+        <!-- Brand -->
+        <div class="auth-brand">
+          <img
+            src="../assets/images/logo.svg"
+            alt="Notes app logo"
+            class="auth-logo"
+          />
+        </div>
 
-  Email Address
-  email@example.com
+        <!-- Header -->
+        <header class="auth-header">
+          <h1 class="auth-title">Create Your Account</h1>
+          <p class="auth-subtitle">
+            Sign up to start organizing your notes and boost your productivity.
+          </p>
+        </header>
 
-  Password
-  At least 8 characters
+        <!-- Signup Form -->
+        <form class="auth-form" novalidate>
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="email@example.com"
+              required
+            />
+          </div>
 
-  Sign Up
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input type="password" id="password" name="password" required />
+              <button
+                type="button"
+                class="password-toggle"
+                id="password-toggle"
+                aria-label="Show password"
+              >
+                <img
+                  src="../assets/images/icon-show-password.svg"
+                  alt=""
+                  class="show-icon"
+                />
+                <img
+                  src="../assets/images/icon-hide-password.svg"
+                  alt=""
+                  class="hide-icon"
+                />
+              </button>
+            </div>
+            <span class="form-hint">
+              <img
+                src="../assets/images/icon-info.svg"
+                alt=""
+                class="hint-icon"
+              />
+              At least 8 characters
+            </span>
+          </div>
 
-  Or log in with:
+          <!-- Submit -->
+          <button type="submit" class="btn btn-primary">Sign up</button>
+        </form>
 
-  Google
+        <!-- Divider -->
+        <hr class="auth-divider" />
 
-  Already have an account? Login
+        <!-- Social Login Text -->
+        <p class="auth-social-text">Or log in with:</p>
 
-</body>
+        <!-- Social Login -->
+        <button type="button" class="btn btn-outline btn-block btn-google">
+          <img src="../assets/images/icon-google.svg" alt="" class="btn-icon" />
+          Google
+        </button>
+
+        <!-- Divider -->
+        <hr class="auth-divider" />
+
+        <!-- Footer -->
+        <p class="auth-footer">
+          Already have an account?
+          <a href="login.html">Login</a>
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="../scripts/auth/index.js"></script>
+  </body>
 </html>

@@ -1,0 +1,348 @@
+/* ==============================
+   Auth Page Layout
+   ============================== */
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: var(--bg-primary);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 540px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ==============================
+   Auth Brand / Logo
+   ============================== */
+
+.auth-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-5);
+}
+
+.auth-logo {
+  height: 28px;
+  width: auto;
+}
+
+/* ==============================
+   Auth Header
+   ============================== */
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.auth-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-2) 0;
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ==============================
+   Auth Form
+   ============================== */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-group label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-link {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.form-link:hover {
+  color: var(--brand-primary);
+}
+
+/* Form Inputs */
+.form-group input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 20, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--neutral-950);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--neutral-500);
+}
+
+/* Password Field */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: var(--space-12);
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+}
+
+.password-toggle img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Toggle visibility of show/hide icons */
+.password-toggle .hide-icon {
+  display: none;
+}
+
+.password-toggle.active .show-icon {
+  display: none;
+}
+
+.password-toggle.active .hide-icon {
+  display: block;
+}
+
+/* ==============================
+   Auth Buttons
+   ============================== */
+
+.auth-form .btn-primary {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--text-inverse);
+  background-color: var(--brand-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auth-form .btn-primary:hover {
+  background-color: var(--brand-primary-hover);
+}
+
+.auth-form .btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--neutral-500);
+}
+
+/* ==============================
+   Auth Divider
+   ============================== */
+
+.auth-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-default);
+  margin: var(--space-6) 0;
+}
+
+/* Social Login Text */
+.auth-social-text {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* ==============================
+   Social Login Button
+   ============================== */
+
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  background-color: transparent;
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 20, 0.03);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-google:hover {
+  background-color: var(--bg-muted);
+  border-color: var(--neutral-400);
+}
+
+.btn-google:focus {
+  outline: none;
+  border-color: var(--neutral-950);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--neutral-500);
+}
+
+.btn-google .btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ==============================
+   Auth Footer
+   ============================== */
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.auth-footer a {
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
+
+/* ==============================
+   Form Validation States
+   ============================== */
+
+.form-group.error input {
+  border-color: var(--error);
+}
+
+.form-group.error input:focus {
+  box-shadow: 0 0 0 3px var(--error-soft);
+}
+
+.form-error-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--error);
+  margin-top: var(--space-1);
+}
+
+/* Error icon before the message */
+.form-error-message::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("../assets/images/icon-error.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+.form-group.success input {
+  border-color: var(--success);
+}
+
+/* ==============================
+   Form Hint Text
+   ============================== */
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+.form-hint .hint-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+/* ==============================
+   Responsive Adjustments
+   ============================== */
+
+@media (max-width: 600px) {
+  .auth-card {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-title {
+    font-size: var(--text-xl);
+  }
+}

@@ -8,12 +8,13 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="./assets/images/favicon-32x32.png"
+      href="../assets/images/favicon-32x32.png"
     />
-    <link rel="stylesheet" href="styles/tokens.css" />
-    <link rel="stylesheet" href="styles/base.css" />
-    <link rel="stylesheet" href="styles/components.css" />
-    <link rel="stylesheet" href="styles/auth.css" />
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="../styles/base.css" />
+    <link rel="stylesheet" href="../styles/themes.css" />
+    <link rel="stylesheet" href="../styles/components.css" />
+    <link rel="stylesheet" href="../styles/auth.css" />
 
     <title>Frontend Mentor | Note-taking web app</title>
   </head>
@@ -23,7 +24,7 @@
         <!-- Brand -->
         <div class="auth-brand">
           <img
-            src="./assets/images/logo.svg"
+            src="../assets/images/logo.svg"
             alt="Notes app logo"
             class="auth-logo"
           />
@@ -53,7 +54,7 @@
           <div class="form-group">
             <div class="form-label-row">
               <label for="password">Password</label>
-              <a href="./forgot-password.html" class="form-link">Forgot</a>
+              <a href="forgot-password.html" class="form-link">Forgot</a>
             </div>
 
             <div class="password-field">
@@ -61,9 +62,19 @@
               <button
                 type="button"
                 class="password-toggle"
+                id="password-toggle"
                 aria-label="Show password"
               >
-                <img src="./assets/images/icon-show-password.svg" alt="" />
+                <img
+                  src="../assets/images/icon-show-password.svg"
+                  alt=""
+                  class="show-icon"
+                />
+                <img
+                  src="../assets/images/icon-hide-password.svg"
+                  alt=""
+                  class="hide-icon"
+                />
               </button>
             </div>
           </div>
@@ -73,22 +84,28 @@
         </form>
 
         <!-- Divider -->
-        <div class="auth-divider">
-          <span>Or log in with:</span>
-        </div>
+        <hr class="auth-divider" />
+
+        <!-- Social Login Text -->
+        <p class="auth-social-text">Or log in with:</p>
 
         <!-- Social Login -->
-        <button class="btn btn-outline btn-google">
-          <img src="./assets/images/icon-google.svg" alt="" />
+        <button type="button" class="btn btn-outline btn-block btn-google">
+          <img src="../assets/images/icon-google.svg" alt="" class="btn-icon" />
           Google
         </button>
+
+        <!-- Divider -->
+        <hr class="auth-divider" />
 
         <!-- Footer -->
         <p class="auth-footer">
           No account yet?
-          <a href="./signup.html">Sign Up</a>
+          <a href="signup.html">Sign Up</a>
         </p>
       </section>
     </main>
+
+    <script type="module" src="../scripts/auth/index.js"></script>
   </body>
 </html>
