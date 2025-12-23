@@ -130,11 +130,11 @@ function handleMenuClick(e) {
   const targetPanel = document.querySelector(`[data-panel="${setting}"]`);
   targetPanel?.classList.add("active");
 
-  // On mobile, show the panels container
+  // On tablet/mobile, show the panels container
   const settingsPanels = document.querySelector(".settings-panels");
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= 1024) {
     settingsPanels?.classList.add("active");
-    // Hide menu on mobile when panel is shown
+    // Hide menu on tablet/mobile when panel is shown
     const settingsMenu = document.querySelector(".settings-menu");
     settingsMenu?.classList.add("hidden");
   }
