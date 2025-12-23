@@ -1,6 +1,6 @@
 /**
  * Form Handlers Module
- * Handles form submissions for all auth pages
+ * Handles form submissions for all auth pages with Appwrite integration
  */
 
 import { getDocument } from "../utils.js";
@@ -11,20 +11,85 @@ import {
   isValidPassword,
   passwordsMatch,
 } from "./validation.js";
+import * as authService from "./authService.js";
+
+// ============================================
+// UI HELPERS
+// ============================================
 
 /**
- * Initialize login form validation and submission
+ * Show loading state on button
  */
+function setButtonLoading(button, loadingText = "Please wait...") {
+  button.disabled = true;
+  button.dataset.originalText = button.textContent;
+  button.textContent = loadingText;
+  button.classList.add("loading");
+}
+
+/**
+ * Reset button to normal state
+ */
+function resetButton(button) {
+  button.disabled = false;
+  button.textContent = button.dataset.originalText || "Submit";
+  button.classList.remove("loading");
+}
+
+/**
+ * Show success message
+ */
+function showSuccessMessage(form, message) {
+  const existing = form.querySelector(".form-success-message");
+  if (existing) existing.remove();
+
+  const successEl = document.createElement("div");
+  successEl.className = "form-success-message";
+  successEl.textContent = message;
+  form.insertBefore(successEl, form.firstChild);
+}
+
+/**
+ * Show form-level error message
+ */
+function showFormError(form, message) {
+  const existing = form.querySelector(".form-error-banner");
+  if (existing) existing.remove();
+
+  const errorEl = document.createElement("div");
+  errorEl.className = "form-error-banner";
+  errorEl.textContent = message;
+  form.insertBefore(errorEl, form.firstChild);
+
+  setTimeout(() => errorEl.remove(), 5000);
+}
+
+function initGoogleOAuth() {
+  const googleBtn = document.querySelector(".btn-google");
+  if (googleBtn) {
+    googleBtn.addEventListener("click", () => {
+      authService.loginWithGoogle();
+    });
+  }
+}
+
+// ============================================
+// LOGIN FORM
+// ============================================
+
 export function initLoginForm() {
   const form = getDocument(".auth-form", "query");
   if (!form) return;
 
   const emailInput = getDocument("email", "id");
   const passwordInput = getDocument("password", "id");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   if (!emailInput || !passwordInput) return;
 
-  // Validate email on blur
+  authService.initAuth();
+  authService.redirectIfLoggedIn();
+
   emailInput.addEventListener("blur", () => {
     if (emailInput.value && !isValidEmail(emailInput.value)) {
       showError(emailInput, "Please enter a valid email address");
@@ -33,7 +98,6 @@ export function initLoginForm() {
     }
   });
 
-  // Clear error on input
   emailInput.addEventListener("input", () => {
     if (isValidEmail(emailInput.value)) {
       clearError(emailInput);
@@ -44,12 +108,10 @@ export function initLoginForm() {
     clearError(passwordInput);
   });
 
-  // Form submission
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     let isValid = true;
 
-    // Validate email
     if (!emailInput.value) {
       showError(emailInput, "Email is required");
       isValid = false;
@@ -58,29 +120,45 @@ export function initLoginForm() {
       isValid = false;
     }
 
-    // Validate password
     if (!passwordInput.value) {
       showError(passwordInput, "Password is required");
       isValid = false;
     }
 
     if (isValid) {
-      // For now, log success - we'll integrate localStorage/Appwrite later
-      console.log("Login form submitted:", {
-        email: emailInput.value,
-        password: passwordInput.value,
-      });
+      setButtonLoading(submitBtn, "Logging in...");
 
-      // TODO: Redirect to main app after authentication
-      // window.location.href = '../index.html';
-      alert("Login successful! (Demo - no backend yet)");
+      const result = await authService.login(
+        emailInput.value,
+        passwordInput.value
+      );
+
+      if (result.success) {
+        showSuccessMessage(form, "Login successful! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "../index.html";
+        }, 1000);
+      } else {
+        resetButton(submitBtn);
+        showFormError(form, result.error);
+      }
     }
   });
+
+  // Google OAuth button
+  initGoogleOAuth();
+
+  // Check for OAuth error in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("error") === "oauth_failed") {
+    showFormError(form, "Google sign-in failed. Please try again.");
+  }
 }
 
-/**
- * Initialize signup form validation and submission
- */
+// ============================================
+// SIGNUP FORM
+// ============================================
+
 export function initSignupForm() {
   const form = getDocument(".auth-form", "query");
   if (!form) return;
@@ -88,10 +166,16 @@ export function initSignupForm() {
   const emailInput = getDocument("email", "id");
   const passwordInput = getDocument("password", "id");
   const confirmPasswordInput = getDocument("confirm-password", "id");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   if (!emailInput || !passwordInput) return;
 
-  // Validate email on blur
+  authService.initAuth();
+  authService.redirectIfLoggedIn();
+
+  // Google OAuth button
+  initGoogleOAuth();
+
   emailInput.addEventListener("blur", () => {
     if (emailInput.value && !isValidEmail(emailInput.value)) {
       showError(emailInput, "Please enter a valid email address");
@@ -100,7 +184,6 @@ export function initSignupForm() {
     }
   });
 
-  // Validate password on blur
   passwordInput.addEventListener("blur", () => {
     if (passwordInput.value && !isValidPassword(passwordInput.value)) {
       showError(passwordInput, "Password must be at least 8 characters");
@@ -109,7 +192,6 @@ export function initSignupForm() {
     }
   });
 
-  // Validate confirm password on blur
   if (confirmPasswordInput) {
     confirmPasswordInput.addEventListener("blur", () => {
       if (
@@ -123,17 +205,12 @@ export function initSignupForm() {
     });
   }
 
-  // Clear errors on input
   emailInput.addEventListener("input", () => {
-    if (isValidEmail(emailInput.value)) {
-      clearError(emailInput);
-    }
+    if (isValidEmail(emailInput.value)) clearError(emailInput);
   });
 
   passwordInput.addEventListener("input", () => {
-    if (isValidPassword(passwordInput.value)) {
-      clearError(passwordInput);
-    }
+    if (isValidPassword(passwordInput.value)) clearError(passwordInput);
   });
 
   if (confirmPasswordInput) {
@@ -144,12 +221,10 @@ export function initSignupForm() {
     });
   }
 
-  // Form submission
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     let isValid = true;
 
-    // Validate email
     if (!emailInput.value) {
       showError(emailInput, "Email is required");
       isValid = false;
@@ -158,7 +233,6 @@ export function initSignupForm() {
       isValid = false;
     }
 
-    // Validate password
     if (!passwordInput.value) {
       showError(passwordInput, "Password is required");
       isValid = false;
@@ -167,7 +241,6 @@ export function initSignupForm() {
       isValid = false;
     }
 
-    // Validate confirm password
     if (confirmPasswordInput) {
       if (!confirmPasswordInput.value) {
         showError(confirmPasswordInput, "Please confirm your password");
@@ -181,29 +254,41 @@ export function initSignupForm() {
     }
 
     if (isValid) {
-      console.log("Signup form submitted:", {
-        email: emailInput.value,
-        password: passwordInput.value,
-      });
+      setButtonLoading(submitBtn, "Creating account...");
 
-      // TODO: Create user account with Appwrite
-      alert("Account created successfully! (Demo - no backend yet)");
+      const result = await authService.signUp(
+        emailInput.value,
+        passwordInput.value
+      );
+
+      if (result.success) {
+        showSuccessMessage(form, "Account created! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "../index.html";
+        }, 1000);
+      } else {
+        resetButton(submitBtn);
+        showFormError(form, result.error);
+      }
     }
   });
 }
 
-/**
- * Initialize forgot password form
- */
+// ============================================
+// FORGOT PASSWORD FORM
+// ============================================
+
 export function initForgotPasswordForm() {
   const form = getDocument(".auth-form", "query");
   if (!form) return;
 
   const emailInput = getDocument("email", "id");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   if (!emailInput) return;
 
-  // Validate email on blur
+  authService.initAuth();
+
   emailInput.addEventListener("blur", () => {
     if (emailInput.value && !isValidEmail(emailInput.value)) {
       showError(emailInput, "Please enter a valid email address");
@@ -213,13 +298,10 @@ export function initForgotPasswordForm() {
   });
 
   emailInput.addEventListener("input", () => {
-    if (isValidEmail(emailInput.value)) {
-      clearError(emailInput);
-    }
+    if (isValidEmail(emailInput.value)) clearError(emailInput);
   });
 
-  // Form submission
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     let isValid = true;
 
@@ -232,27 +314,47 @@ export function initForgotPasswordForm() {
     }
 
     if (isValid) {
-      console.log("Password reset requested for:", emailInput.value);
+      setButtonLoading(submitBtn, "Sending...");
 
-      // TODO: Send reset email with Appwrite
-      alert("Password reset link sent! (Demo - no backend yet)");
+      const result = await authService.sendPasswordRecovery(emailInput.value);
+
+      resetButton(submitBtn);
+      showSuccessMessage(
+        form,
+        "If an account exists with this email, you will receive a password reset link shortly."
+      );
+      emailInput.value = "";
     }
   });
 }
 
-/**
- * Initialize reset password form
- */
+// ============================================
+// RESET PASSWORD FORM
+// ============================================
+
 export function initResetPasswordForm() {
   const form = getDocument(".auth-form", "query");
   if (!form) return;
 
   const passwordInput = getDocument("password", "id");
   const confirmPasswordInput = getDocument("confirm-password", "id");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   if (!passwordInput || !confirmPasswordInput) return;
 
-  // Validate password on blur
+  authService.initAuth();
+
+  const { userId, secret } = authService.getResetParams();
+
+  if (!userId || !secret) {
+    showFormError(
+      form,
+      "Invalid or expired reset link. Please request a new one."
+    );
+    if (submitBtn) submitBtn.disabled = true;
+    return;
+  }
+
   passwordInput.addEventListener("blur", () => {
     if (passwordInput.value && !isValidPassword(passwordInput.value)) {
       showError(passwordInput, "Password must be at least 8 characters");
@@ -261,7 +363,6 @@ export function initResetPasswordForm() {
     }
   });
 
-  // Validate confirm password on blur
   confirmPasswordInput.addEventListener("blur", () => {
     if (
       confirmPasswordInput.value &&
@@ -273,11 +374,8 @@ export function initResetPasswordForm() {
     }
   });
 
-  // Clear errors on input
   passwordInput.addEventListener("input", () => {
-    if (isValidPassword(passwordInput.value)) {
-      clearError(passwordInput);
-    }
+    if (isValidPassword(passwordInput.value)) clearError(passwordInput);
   });
 
   confirmPasswordInput.addEventListener("input", () => {
@@ -286,8 +384,7 @@ export function initResetPasswordForm() {
     }
   });
 
-  // Form submission
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     let isValid = true;
 
@@ -310,10 +407,26 @@ export function initResetPasswordForm() {
     }
 
     if (isValid) {
-      console.log("Password reset completed");
+      setButtonLoading(submitBtn, "Resetting password...");
 
-      // TODO: Update password with Appwrite
-      alert("Password reset successful! (Demo - no backend yet)");
+      const result = await authService.resetPassword(
+        userId,
+        secret,
+        passwordInput.value
+      );
+
+      if (result.success) {
+        showSuccessMessage(
+          form,
+          "Password reset successful! Redirecting to login..."
+        );
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 2000);
+      } else {
+        resetButton(submitBtn);
+        showFormError(form, result.error);
+      }
     }
   });
 }

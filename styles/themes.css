@@ -1,0 +1,411 @@
+/* ==============================
+   Theme-Specific Overrides
+   ============================== */
+
+/* ==============================
+   Dark Theme Overrides
+   ============================== */
+
+/* Logo - swap to white version in dark mode */
+[data-theme="dark"] .sidebar-logo img,
+[data-theme="dark"] .auth-logo,
+[data-theme="dark"] .mobile-header-logo img {
+  content: url("../assets/images/logo-dark.svg");
+}
+
+[data-theme="dark"] .sidebar {
+  background-color: var(--neutral-950);
+  border-right-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .sidebar-nav {
+  border-bottom-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .nav-item {
+  color: var(--neutral-300);
+}
+
+[data-theme="dark"] .nav-item:hover,
+[data-theme="dark"] .nav-item.active {
+  background-color: var(--neutral-800);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .nav-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .nav-item:hover .nav-icon,
+[data-theme="dark"] .nav-item.active .nav-icon {
+  opacity: 1;
+}
+
+[data-theme="dark"] .tags-title {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .tag-item {
+  color: var(--neutral-200);
+}
+
+[data-theme="dark"] .tag-item img {
+  filter: brightness(0) invert(1);
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .main-header {
+  background-color: var(--neutral-950);
+  border-bottom-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .page-title {
+  color: var(--neutral-0);
+}
+
+/* Search Box - Dark Theme */
+[data-theme="dark"] .search-box {
+  background-color: var(--neutral-800);
+  border-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .search-box input {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .search-box input::placeholder {
+  color: var(--neutral-500);
+}
+
+[data-theme="dark"] .search-box:focus-within {
+  border-color: var(--neutral-600);
+}
+
+[data-theme="dark"] .search-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .btn-icon img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+/* Notes List Section - Dark Theme */
+[data-theme="dark"] .notes-list-section {
+  background-color: var(--neutral-950);
+  border-right-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .btn-create-note {
+  background-color: var(--blue-500);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .btn-create-note:hover {
+  background-color: var(--blue-700);
+}
+
+[data-theme="dark"] .btn-create-note img {
+  filter: brightness(0) invert(1);
+}
+
+/* Note Card - Dark Theme */
+[data-theme="dark"] .note-card {
+  border-bottom-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .note-card:hover,
+[data-theme="dark"] .note-card.active {
+  background-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .note-card-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .note-card-date {
+  color: var(--neutral-400);
+}
+
+/* Tag Badge - Dark Theme */
+[data-theme="dark"] .tag-badge {
+  background-color: var(--neutral-700);
+  color: var(--neutral-200);
+}
+
+/* Note Detail Section - Dark Theme */
+[data-theme="dark"] .note-detail-section {
+  background-color: var(--neutral-950);
+}
+
+[data-theme="dark"] .note-title {
+  color: var(--neutral-0);
+  font-feature-settings: "liga" off, "clig" off;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 120%;
+  letter-spacing: -0.5px;
+}
+
+[data-theme="dark"] .note-meta {
+  border-bottom-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .meta-label {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .meta-value {
+  color: var(--neutral-300);
+}
+
+[data-theme="dark"] .meta-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .meta-input {
+  color: var(--neutral-0);
+  background-color: transparent;
+}
+
+[data-theme="dark"] .meta-input::placeholder {
+  color: var(--neutral-500);
+}
+
+[data-theme="dark"] .note-content textarea {
+  color: var(--neutral-100);
+  background-color: transparent;
+  font-feature-settings: "liga" off, "clig" off;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 130%;
+  letter-spacing: -0.2px;
+}
+
+[data-theme="dark"] .note-content textarea::placeholder {
+  color: var(--neutral-500);
+}
+
+/* Note Actions - Dark Theme */
+[data-theme="dark"] .note-actions {
+  border-top-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background-color: var(--neutral-800);
+  color: var(--neutral-200);
+  border-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background-color: var(--neutral-700);
+  color: var(--neutral-0);
+}
+
+/* Note Actions Sidebar - Dark Theme */
+[data-theme="dark"] .note-actions-sidebar {
+  background-color: var(--neutral-950);
+  border-left-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .btn-action {
+  background-color: var(--neutral-800);
+  border-color: var(--neutral-700);
+  color: var(--neutral-0);
+  font-feature-settings: "liga" off, "clig" off;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 130%;
+  letter-spacing: -0.2px;
+}
+
+[data-theme="dark"] .btn-action:hover {
+  background-color: var(--neutral-700);
+  border-color: var(--neutral-600);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .btn-action img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+/* Toast - Dark Theme */
+[data-theme="dark"] .toast {
+  background-color: var(--neutral-800);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .toast-success {
+  background-color: var(--green-500);
+}
+
+[data-theme="dark"] .toast-error {
+  background-color: var(--red-500);
+}
+
+/* Mobile Nav - Dark Theme */
+[data-theme="dark"] .mobile-nav {
+  background-color: var(--neutral-950);
+  border-top-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .mobile-nav-item {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .mobile-nav-item.active {
+  color: var(--blue-500);
+}
+
+[data-theme="dark"] .mobile-nav-item img {
+  filter: brightness(0) invert(0.6);
+}
+
+[data-theme="dark"] .mobile-nav-item.active img {
+  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(213deg)
+    brightness(100%) contrast(108%);
+}
+
+/* FAB - Dark Theme */
+[data-theme="dark"] .fab {
+  background-color: var(--blue-500);
+}
+
+[data-theme="dark"] .fab:hover {
+  background-color: var(--blue-700);
+}
+
+/* Mobile Search View - Dark Theme */
+[data-theme="dark"] .mobile-search-view {
+  background-color: var(--neutral-950);
+}
+
+[data-theme="dark"] .mobile-search-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .mobile-search-box {
+  background-color: var(--neutral-800);
+  border-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .mobile-search-box input {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .mobile-search-box input::placeholder {
+  color: var(--neutral-500);
+}
+
+[data-theme="dark"] .mobile-search-box .search-icon {
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .mobile-search-info,
+[data-theme="dark"] .search-info {
+  color: var(--neutral-400);
+}
+
+/* Mobile Tags View - Dark Theme */
+[data-theme="dark"] .mobile-tags-view {
+  background-color: var(--neutral-950);
+}
+
+[data-theme="dark"] .mobile-tags-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .mobile-tag-item {
+  color: var(--neutral-300);
+}
+
+[data-theme="dark"] .mobile-tag-item:hover {
+  background-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .mobile-tag-item img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+
+/* Mobile Header - Dark Theme */
+[data-theme="dark"] .mobile-header {
+  background-color: var(--neutral-800);
+  border-bottom-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .mobile-header-logo img {
+  content: url("../assets/images/logo-dark.svg");
+}
+
+/* Mobile Note Header - Dark Theme */
+[data-theme="dark"] .mobile-note-header {
+  background-color: var(--neutral-950);
+  border-bottom-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .btn-back {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .btn-back img {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="dark"] .btn-icon-action img {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="dark"] .btn-icon-action:hover {
+  background-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .btn-text {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .btn-text-primary {
+  color: var(--neutral-0);
+}
+
+/* Primary Button - Dark Theme (keep white text on blue background) */
+[data-theme="dark"] .btn-primary {
+  color: var(--neutral-0);
+}
+
+/* Auth Google Button - Dark Theme */
+[data-theme="dark"] .btn-google .btn-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* ==============================
+   Font Theme Variations
+   ============================== */
+
+[data-font="sans-serif"] {
+  --font-body: var(--font-sans);
+}
+
+[data-font="serif"] {
+  --font-body: var(--font-serif);
+}
+
+[data-font="monospace"] {
+  --font-body: var(--font-mono);
+}
+
+/* Apply font to body text areas */
+[data-font="serif"] .note-content textarea,
+[data-font="serif"] .note-title {
+  font-family: var(--font-serif);
+}
+
+[data-font="monospace"] .note-content textarea,
+[data-font="monospace"] .note-title {
+  font-family: var(--font-mono);
+}

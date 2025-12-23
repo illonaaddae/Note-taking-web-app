@@ -1,0 +1,561 @@
+/* ==============================
+   Settings Page Styles
+   ============================== */
+
+/* Settings Content Layout */
+.settings-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 73px);
+  overflow: hidden;
+  background-color: var(--neutral-0);
+}
+
+/* Settings Menu */
+.settings-menu {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border-right: 1px solid var(--neutral-200);
+  background-color: transparent;
+  height: fit-content;
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.settings-menu-item img:first-child {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+.settings-menu-item span {
+  flex: 1;
+}
+
+.settings-menu-item .menu-arrow {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.settings-menu-item:hover {
+  background-color: var(--bg-muted);
+}
+
+.settings-menu-item:hover .menu-arrow {
+  opacity: 0.5;
+}
+
+.settings-menu-item.active {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.settings-menu-item.active img:first-child {
+  opacity: 1;
+}
+
+.settings-menu-item.active .menu-arrow {
+  opacity: 1;
+}
+
+/* Settings Panels */
+.settings-panels {
+  padding: var(--space-8);
+  overflow-y: auto;
+  background-color: var(--neutral-0);
+}
+
+.settings-panel {
+  display: none;
+  max-width: 528px;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
+/* Mobile back button - hidden on desktop */
+.mobile-settings-back {
+  display: none;
+}
+
+.panel-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.panel-description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+/* Theme Options */
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.theme-option {
+  cursor: pointer;
+}
+
+.theme-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.theme-option:hover .option-content {
+  background-color: var(--bg-muted);
+}
+
+.theme-option input:checked + .option-content {
+  border-color: var(--brand-primary);
+  background-color: var(--brand-soft);
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-muted);
+  flex-shrink: 0;
+}
+
+.option-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.font-icon {
+  background-color: var(--neutral-100);
+  border: 1px solid var(--neutral-200);
+}
+
+.option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.option-title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.option-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.option-check {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neutral-300);
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.theme-option input:checked + .option-content .option-check {
+  border-color: var(--brand-primary);
+  background-color: var(--brand-primary);
+}
+
+.theme-option input:checked + .option-content .option-check::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: var(--neutral-0);
+  border-radius: 50%;
+}
+
+/* Apply Button */
+.btn-apply {
+  width: auto;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  float: right;
+  background-color: var(--blue-500);
+  color: var(--neutral-0);
+  border: none;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-apply:hover {
+  background-color: var(--blue-700);
+}
+
+/* Password Form */
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.password-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.password-form .form-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.password-form .input-wrapper {
+  position: relative;
+}
+
+.password-form .form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  padding-right: var(--space-12);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.password-form .form-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.password-form .password-toggle {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-form .password-toggle img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.password-form .password-toggle:hover img {
+  opacity: 1;
+}
+
+.password-form .password-toggle .icon-hide {
+  display: none;
+}
+
+.password-form .password-toggle.active .icon-show {
+  display: none;
+}
+
+.password-form .password-toggle.active .icon-hide {
+  display: block;
+}
+
+.password-form .form-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.password-form .form-hint img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+.password-form .btn-apply {
+  margin-top: var(--space-4);
+  align-self: flex-end;
+}
+
+/* ==============================
+   Dark Theme Overrides
+   ============================== */
+
+[data-theme="dark"] .settings-content {
+  background-color: var(--neutral-950);
+}
+
+[data-theme="dark"] .settings-menu {
+  background-color: transparent;
+  border-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .settings-menu-item {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .settings-menu-item:hover {
+  background-color: var(--neutral-800);
+  color: var(--neutral-200);
+}
+
+[data-theme="dark"] .settings-menu-item.active {
+  background-color: var(--neutral-800);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .settings-menu-item img {
+  filter: brightness(0) invert(1);
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .settings-menu-item.active img {
+  opacity: 1;
+}
+
+[data-theme="dark"] .settings-panels {
+  background-color: var(--neutral-950);
+}
+
+[data-theme="dark"] .panel-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .panel-description {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .option-content {
+  border-color: var(--neutral-700);
+  background-color: transparent;
+}
+
+[data-theme="dark"] .theme-option:hover .option-content {
+  background-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .theme-option input:checked + .option-content {
+  border-color: var(--brand-primary);
+  background-color: rgba(51, 92, 255, 0.1);
+}
+
+[data-theme="dark"] .option-icon {
+  background-color: var(--neutral-800);
+}
+
+[data-theme="dark"] .option-icon img {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .font-icon {
+  background-color: var(--neutral-800);
+  border-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .option-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .option-desc {
+  color: var(--neutral-400);
+}
+
+[data-theme="dark"] .option-check {
+  border-color: var(--neutral-600);
+}
+
+[data-theme="dark"] .password-form .form-label {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .password-form .form-input {
+  border-color: var(--neutral-700);
+  background-color: var(--neutral-800);
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .password-form .form-input::placeholder {
+  color: var(--neutral-500);
+}
+
+[data-theme="dark"] .password-form .form-input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(51, 92, 255, 0.2);
+}
+
+[data-theme="dark"] .password-form .password-toggle img {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="dark"] .password-form .form-hint {
+  color: var(--neutral-500);
+}
+
+[data-theme="dark"] .password-form .form-hint img {
+  filter: brightness(0) invert(1);
+}
+
+/* ==============================
+   Responsive Design
+   ============================== */
+
+/* Tablet & Mobile Breakpoint - Single column layout */
+@media (max-width: 1024px) {
+  /* Remove header border on settings page */
+  .main-header {
+    border-bottom: none;
+  }
+
+  .settings-content {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 120px);
+    padding-bottom: 80px;
+    background-color: var(--neutral-0);
+  }
+
+  .settings-menu {
+    flex-direction: column;
+    padding: 0 var(--space-4);
+    border-right: none;
+    gap: 0;
+    margin: 0;
+    background-color: transparent;
+    border-radius: 0;
+    border: none;
+  }
+
+  .settings-menu.hidden {
+    display: none;
+  }
+
+  .settings-menu-item {
+    padding: var(--space-4) 0;
+    border-bottom: none;
+    border-radius: 0;
+  }
+
+  .settings-menu-item:hover,
+  .settings-menu-item.active {
+    background-color: transparent;
+  }
+
+  /* Only show separator after Change Password */
+  .settings-menu-item[data-setting="change-password"] {
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  .settings-menu-item .menu-arrow {
+    display: none;
+  }
+
+  .settings-panels {
+    display: none;
+    padding: var(--space-4);
+  }
+
+  .settings-panels.active {
+    display: block;
+  }
+
+  /* Mobile back button for settings panels */
+  .mobile-settings-back {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) 0;
+    margin-bottom: var(--space-4);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .mobile-settings-back img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .btn-apply {
+    width: auto;
+    float: none;
+    display: block;
+    margin: var(--space-4) 0 0 auto;
+  }
+
+  .password-form .btn-apply {
+    align-self: flex-end;
+  }
+
+  [data-theme="dark"] .settings-content {
+    background-color: var(--neutral-950);
+  }
+
+  [data-theme="dark"] .settings-menu {
+    background-color: transparent;
+  }
+
+  [data-theme="dark"] .settings-menu-item[data-setting="change-password"] {
+    border-bottom-color: var(--neutral-700);
+  }
+
+  [data-theme="dark"] .mobile-settings-back {
+    color: var(--neutral-400);
+  }
+
+  [data-theme="dark"] .mobile-settings-back img {
+    filter: brightness(0) invert(1);
+  }
+}

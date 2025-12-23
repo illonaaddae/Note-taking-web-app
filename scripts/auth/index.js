@@ -14,6 +14,8 @@ import {
   initForgotPasswordForm,
   initResetPasswordForm,
 } from "./formHandlers.js";
+import * as authService from "./authService.js";
+import { initTheme } from "../theme.js";
 
 // Re-export for use elsewhere if needed
 export {
@@ -33,6 +35,7 @@ export {
   initForgotPasswordForm,
   initResetPasswordForm,
 } from "./formHandlers.js";
+export * as authService from "./authService.js";
 
 /**
  * Detect current page and initialize appropriate handlers
@@ -59,4 +62,10 @@ function detectAndInitialize() {
 }
 
 // Initialize on DOM Ready
-document.addEventListener("DOMContentLoaded", detectAndInitialize);
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize theme first
+  initTheme();
+
+  // Then initialize page-specific handlers
+  detectAndInitialize();
+});

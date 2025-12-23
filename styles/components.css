@@ -189,3 +189,215 @@
   height: 20px;
   display: inline-block;
 }
+
+/* ==============================
+   Modal Component
+   ============================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(14, 18, 27, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(0.95);
+  transition: transform 0.2s ease;
+}
+
+.modal-overlay.active .modal {
+  transform: scale(1);
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.modal-icon img {
+  width: 24px;
+  height: 24px;
+}
+
+.modal-icon.danger {
+  background-color: var(--error-soft);
+}
+
+.modal-icon.danger img {
+  filter: invert(27%) sepia(91%) saturate(2353%) hue-rotate(336deg)
+    brightness(104%) contrast(97%);
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.modal-message {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-6);
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.modal-actions .btn {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-actions .btn-secondary {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+  border: none;
+}
+
+.modal-actions .btn-secondary:hover {
+  background-color: var(--neutral-200);
+}
+
+.modal-actions .btn-danger {
+  background-color: var(--error);
+  color: var(--neutral-0);
+  border: none;
+}
+
+.modal-actions .btn-danger:hover {
+  background-color: #e02d3c;
+}
+
+.modal-actions .btn-primary {
+  width: auto;
+}
+
+/* Dark theme modal overrides */
+[data-theme="dark"] .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .modal {
+  background-color: var(--neutral-800);
+  border: 1px solid var(--neutral-700);
+}
+
+[data-theme="dark"] .modal-icon {
+  background-color: var(--neutral-700);
+}
+
+[data-theme="dark"] .modal-icon img {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .modal-icon.danger {
+  background-color: var(--error-soft);
+}
+
+[data-theme="dark"] .modal-icon.danger img {
+  filter: invert(27%) sepia(91%) saturate(2353%) hue-rotate(336deg)
+    brightness(104%) contrast(97%);
+}
+
+[data-theme="dark"] .modal-title {
+  color: var(--neutral-0);
+}
+
+[data-theme="dark"] .modal-message {
+  color: var(--neutral-300);
+}
+
+[data-theme="dark"] .modal-actions .btn-secondary {
+  background-color: var(--neutral-700);
+  color: var(--neutral-200);
+}
+
+[data-theme="dark"] .modal-actions .btn-secondary:hover {
+  background-color: var(--neutral-600);
+}
+
+/* ==============================
+   Toast Component
+   ============================== */
+
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  background-color: var(--neutral-900);
+  color: var(--neutral-0);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-success {
+  background-color: var(--success);
+}
+
+.toast-error {
+  background-color: var(--error);
+}
+
+.toast-info {
+  background-color: var(--brand-primary);
+}
+
+[data-theme="dark"] .toast {
+  background-color: var(--neutral-0);
+  color: var(--neutral-900);
+}
+
+[data-theme="dark"] .toast-success,
+[data-theme="dark"] .toast-error,
+[data-theme="dark"] .toast-info {
+  color: var(--neutral-0);
+}

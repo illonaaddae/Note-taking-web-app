@@ -12,9 +12,9 @@
     />
     <link rel="stylesheet" href="./styles/tokens.css" />
     <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/themes.css" />
     <link rel="stylesheet" href="./styles/components.css" />
     <link rel="stylesheet" href="./styles/dashboard.css" />
+    <link rel="stylesheet" href="./styles/themes.css" />
 
     <title>Frontend Mentor | Note-taking web app</title>
   </head>
@@ -57,6 +57,13 @@
         </div>
       </aside>
 
+      <!-- ===== MOBILE HEADER ===== -->
+      <header class="mobile-header">
+        <div class="mobile-header-logo">
+          <img src="./assets/images/logo.svg" alt="Notes app logo" />
+        </div>
+      </header>
+
       <!-- ===== MAIN CONTENT ===== -->
       <main class="main-content">
         <!-- Header -->
@@ -87,6 +94,9 @@
         <div class="content-area">
           <!-- Notes List Column -->
           <section class="notes-list-section">
+            <!-- Search Results Info (Desktop) -->
+            <p class="search-info hidden" id="search-info"></p>
+
             <!-- Create New Note Button -->
             <button
               class="btn btn-primary btn-create-note"
@@ -102,12 +112,69 @@
             </div>
           </section>
 
+          <!-- Mobile Search View -->
+          <section class="mobile-search-view hidden" id="mobile-search-view">
+            <h2 class="mobile-search-title">Search</h2>
+            <div class="mobile-search-box">
+              <img
+                src="./assets/images/icon-search.svg"
+                alt=""
+                class="search-icon"
+              />
+              <input
+                type="text"
+                id="mobile-search-input"
+                placeholder="Search by title, content, or tags..."
+              />
+            </div>
+            <p class="mobile-search-info" id="mobile-search-info"></p>
+            <div class="mobile-search-results" id="mobile-search-results">
+              <!-- Search results will be dynamically populated -->
+            </div>
+          </section>
+
+          <!-- Mobile Tags View -->
+          <section class="mobile-tags-view hidden" id="mobile-tags-view">
+            <h2 class="mobile-tags-title">Tags</h2>
+            <div class="mobile-tags-list" id="mobile-tags-list">
+              <!-- Tags will be dynamically populated -->
+            </div>
+          </section>
+
           <!-- Note Detail/Editor Column -->
           <section class="note-detail-section" id="note-detail">
+            <!-- Mobile Note Header -->
+            <div class="mobile-note-header">
+              <button class="btn-back" id="mobile-back-btn">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                <span>Go Back</span>
+              </button>
+              <div class="mobile-note-actions">
+                <button
+                  class="btn-icon-action"
+                  id="mobile-delete-btn"
+                  aria-label="Delete note"
+                >
+                  <img src="./assets/images/icon-delete.svg" alt="" />
+                </button>
+                <button
+                  class="btn-icon-action"
+                  id="mobile-archive-btn"
+                  aria-label="Archive note"
+                >
+                  <img src="./assets/images/icon-archive.svg" alt="" />
+                </button>
+                <button class="btn-text" id="mobile-cancel-btn">Cancel</button>
+                <button class="btn-text btn-text-primary" id="mobile-save-btn">
+                  Save Note
+                </button>
+              </div>
+            </div>
+
             <!-- Note Header -->
             <div class="note-header">
               <h2 class="note-title" id="note-title" contenteditable="true">
-                Select a note to view
+                Enter a title…
               </h2>
             </div>
 
@@ -126,6 +193,15 @@
                   id="note-tags"
                   placeholder="Add tags (comma separated)"
                 />
+              </div>
+              <div class="meta-item meta-status hidden" id="note-status-row">
+                <img
+                  src="./assets/images/icon-status.svg"
+                  alt=""
+                  class="meta-icon"
+                />
+                <span class="meta-label">Status</span>
+                <span class="meta-value" id="note-status">Active</span>
               </div>
               <div class="meta-item">
                 <img
@@ -199,8 +275,33 @@
       </button>
     </div>
 
+    <!-- ===== CONFIRMATION MODAL ===== -->
+    <div class="modal-overlay" id="modal-overlay" aria-hidden="true">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal-icon" id="modal-icon">
+          <img src="./assets/images/icon-delete.svg" alt="" />
+        </div>
+        <h2 class="modal-title" id="modal-title">Delete Note</h2>
+        <p class="modal-message" id="modal-message">
+          Are you sure you want to permanently delete this note? This action
+          cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+          <button class="btn btn-danger" id="modal-confirm">Delete Note</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Appwrite SDK -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@17.0.0"></script>
+    <!-- Seed Data Script (remove after seeding) -->
+    <script src="./scripts/seedData.js"></script>
     <script type="module" src="./scripts/main.js"></script>
   </body>
 </html>

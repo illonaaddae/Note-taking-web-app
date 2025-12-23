@@ -23,6 +23,7 @@ const CONFIG = {
 
 let client;
 let databases;
+let account;
 
 /**
  * Initialize the Appwrite client
@@ -36,6 +37,7 @@ export async function initAppwrite() {
   client.setEndpoint(CONFIG.endpoint).setProject(CONFIG.projectId);
 
   databases = new Databases(client);
+  account = new Account(client);
 
   // Ping the Appwrite server to verify the setup
   try {
@@ -49,6 +51,54 @@ export async function initAppwrite() {
   }
 
   console.log("Appwrite initialized successfully!");
+}
+
+// ============================================
+// AUTHENTICATION
+// ============================================
+
+/**
+ * Get current logged in user
+ * @returns {Promise<Object|null>} - User object or null
+ */
+export async function getCurrentUser() {
+  try {
+    const user = await account.get();
+    return user;
+  } catch (error) {
+    // User is not logged in
+    return null;
+  }
+}
+
+/**
+ * Logout the current user
+ * @returns {Promise<boolean>} - True if successful
+ */
+export async function logout() {
+  try {
+    await account.deleteSession("current");
+    return true;
+  } catch (error) {
+    console.error("Logout error:", error);
+    return false;
+  }
+}
+
+/**
+ * Update user's password
+ * @param {string} newPassword - New password
+ * @param {string} oldPassword - Current password
+ * @returns {Promise<boolean>} - True if successful
+ */
+export async function updatePassword(newPassword, oldPassword) {
+  try {
+    await account.updatePassword(newPassword, oldPassword);
+    return true;
+  } catch (error) {
+    console.error("Update password error:", error);
+    throw error;
+  }
 }
 
 // ============================================

@@ -1,78 +1,440 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-  
-  <title>Frontend Mentor | Note-taking web app</title>
-</head>
-<body>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+    <link rel="stylesheet" href="./styles/dashboard.css" />
+    <link rel="stylesheet" href="./styles/settings.css" />
+    <link rel="stylesheet" href="./styles/themes.css" />
 
-  All Notes
-  Archived Notes
-  Tags
+    <title>Settings | Note-taking web app</title>
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- ===== LEFT SIDEBAR ===== -->
+      <aside class="sidebar">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+          <img src="./assets/images/logo.svg" alt="Notes app logo" />
+        </div>
 
-  Search by title, content, or tags
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+          <a href="index.html" class="nav-item" data-page="all-notes">
+            <img src="./assets/images/icon-home.svg" alt="" class="nav-icon" />
+            <span>All Notes</span>
+            <img
+              src="./assets/images/icon-chevron-right.svg"
+              alt=""
+              class="nav-arrow"
+            />
+          </a>
+          <a href="index.html#archived" class="nav-item" data-page="archived">
+            <img
+              src="./assets/images/icon-archive.svg"
+              alt=""
+              class="nav-icon"
+            />
+            <span>Archived Notes</span>
+          </a>
+        </nav>
 
-  Color Theme
-  Font Theme
-  Change Password
-  Logout
+        <!-- Tags Section -->
+        <div class="sidebar-tags">
+          <h3 class="tags-title">Tags</h3>
+          <ul class="tags-list" id="sidebar-tags">
+            <!-- Tags will be dynamically populated -->
+          </ul>
+        </div>
+      </aside>
 
-  <!-- Color theme content start -->
+      <!-- ===== MOBILE HEADER ===== -->
+      <header class="mobile-header">
+        <div class="mobile-header-logo">
+          <img src="./assets/images/logo.svg" alt="Notes app logo" />
+        </div>
+      </header>
 
-  Color Theme
-  Choose your color theme:
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+          <h1 class="page-title" id="page-title">Settings</h1>
 
-  Light Mode
-  Pick a clean and classic light theme
+          <!-- Search & Settings (Desktop) -->
+          <div class="header-actions">
+            <div class="search-box">
+              <img
+                src="./assets/images/icon-search.svg"
+                alt=""
+                class="search-icon"
+              />
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search by title, content, or tags..."
+              />
+            </div>
+            <button class="btn-icon" id="settings-btn" aria-label="Settings">
+              <img src="./assets/images/icon-settings.svg" alt="" />
+            </button>
+          </div>
+        </header>
 
-  Dark Mode
-  Select a sleek and modern dark theme
+        <!-- Settings Content Area -->
+        <div class="settings-content">
+          <!-- Settings Menu -->
+          <nav class="settings-menu">
+            <button
+              class="settings-menu-item active"
+              data-setting="color-theme"
+            >
+              <img src="./assets/images/icon-sun.svg" alt="" />
+              <span>Color Theme</span>
+              <img
+                src="./assets/images/icon-chevron-right.svg"
+                alt=""
+                class="menu-arrow"
+              />
+            </button>
+            <button class="settings-menu-item" data-setting="font-theme">
+              <img src="./assets/images/icon-font.svg" alt="" />
+              <span>Font Theme</span>
+              <img
+                src="./assets/images/icon-chevron-right.svg"
+                alt=""
+                class="menu-arrow"
+              />
+            </button>
+            <button class="settings-menu-item" data-setting="change-password">
+              <img src="./assets/images/icon-lock.svg" alt="" />
+              <span>Change Password</span>
+              <img
+                src="./assets/images/icon-chevron-right.svg"
+                alt=""
+                class="menu-arrow"
+              />
+            </button>
+            <button class="settings-menu-item" id="logout-btn">
+              <img src="./assets/images/icon-logout.svg" alt="" />
+              <span>Logout</span>
+            </button>
+          </nav>
 
-  System
-  Adapts to your device's theme
+          <!-- Settings Panels -->
+          <div class="settings-panels">
+            <!-- Color Theme Panel -->
+            <section
+              class="settings-panel active"
+              id="color-theme-panel"
+              data-panel="color-theme"
+            >
+              <button class="mobile-settings-back" id="back-from-color">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                <span>Settings</span>
+              </button>
+              <h2 class="panel-title">Color Theme</h2>
+              <p class="panel-description">Choose your color theme:</p>
 
-  Apply Changes
+              <div class="theme-options">
+                <label class="theme-option">
+                  <input
+                    type="radio"
+                    name="color-theme"
+                    value="light"
+                    checked
+                  />
+                  <div class="option-content">
+                    <div class="option-icon">
+                      <img src="./assets/images/icon-sun.svg" alt="" />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">Light Mode</span>
+                      <span class="option-desc"
+                        >Pick a clean and classic light theme</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
 
-  <!-- Color theme content end -->
+                <label class="theme-option">
+                  <input type="radio" name="color-theme" value="dark" />
+                  <div class="option-content">
+                    <div class="option-icon">
+                      <img src="./assets/images/icon-moon.svg" alt="" />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">Dark Mode</span>
+                      <span class="option-desc"
+                        >Select a sleek and modern dark theme</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
 
-  <!-- Font theme content start -->
+                <label class="theme-option">
+                  <input type="radio" name="color-theme" value="system" />
+                  <div class="option-content">
+                    <div class="option-icon">
+                      <img src="./assets/images/icon-system-theme.svg" alt="" />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">System</span>
+                      <span class="option-desc"
+                        >Adapts to your device's theme</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
+              </div>
 
-  Font Theme
-  Choose your font theme:
+              <button class="btn btn-primary btn-apply" id="apply-color-theme">
+                Apply Changes
+              </button>
+            </section>
 
-  Sans-serif
-  Clean and modern, easy to read.
+            <!-- Font Theme Panel -->
+            <section
+              class="settings-panel"
+              id="font-theme-panel"
+              data-panel="font-theme"
+            >
+              <button class="mobile-settings-back" id="back-from-font">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                <span>Settings</span>
+              </button>
+              <h2 class="panel-title">Font Theme</h2>
+              <p class="panel-description">Choose your font theme:</p>
 
-  Serif
-  Classic and elegant for a timeless feel.
+              <div class="theme-options">
+                <label class="theme-option">
+                  <input
+                    type="radio"
+                    name="font-theme"
+                    value="sans-serif"
+                    checked
+                  />
+                  <div class="option-content">
+                    <div class="option-icon font-icon">
+                      <img
+                        src="./assets/images/icon-font-sans-serif.svg"
+                        alt=""
+                      />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">Sans-serif</span>
+                      <span class="option-desc"
+                        >Clean and modern, easy to read.</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
 
-  Monospace
-  Code-like, great for a technical vibe.
+                <label class="theme-option">
+                  <input type="radio" name="font-theme" value="serif" />
+                  <div class="option-content">
+                    <div class="option-icon font-icon">
+                      <img src="./assets/images/icon-font-serif.svg" alt="" />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">Serif</span>
+                      <span class="option-desc"
+                        >Classic and elegant for a timeless feel.</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
 
-  Apply Changes
+                <label class="theme-option">
+                  <input type="radio" name="font-theme" value="monospace" />
+                  <div class="option-content">
+                    <div class="option-icon font-icon">
+                      <img
+                        src="./assets/images/icon-font-monospace.svg"
+                        alt=""
+                      />
+                    </div>
+                    <div class="option-text">
+                      <span class="option-title">Monospace</span>
+                      <span class="option-desc"
+                        >Code-like, great for a technical vibe.</span
+                      >
+                    </div>
+                    <span class="option-check"></span>
+                  </div>
+                </label>
+              </div>
 
-  <!-- Font theme content end -->
+              <button class="btn btn-primary btn-apply" id="apply-font-theme">
+                Apply Changes
+              </button>
+            </section>
 
-  <!-- Change password content start -->
+            <!-- Change Password Panel -->
+            <section
+              class="settings-panel"
+              id="change-password-panel"
+              data-panel="change-password"
+            >
+              <button class="mobile-settings-back" id="back-from-password">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                <span>Settings</span>
+              </button>
+              <h2 class="panel-title">Change Password</h2>
 
-  Change Password
+              <form class="password-form" id="change-password-form">
+                <div class="form-group">
+                  <label for="old-password" class="form-label"
+                    >Old Password</label
+                  >
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="old-password"
+                      class="form-input"
+                      placeholder=""
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle"
+                      data-target="old-password"
+                      aria-label="Toggle password visibility"
+                    >
+                      <img
+                        src="./assets/images/icon-show-password.svg"
+                        alt=""
+                        class="icon-show"
+                      />
+                      <img
+                        src="./assets/images/icon-hide-password.svg"
+                        alt=""
+                        class="icon-hide"
+                      />
+                    </button>
+                  </div>
+                </div>
 
-  Change Password
+                <div class="form-group">
+                  <label for="new-password" class="form-label"
+                    >New Password</label
+                  >
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="new-password"
+                      class="form-input"
+                      placeholder=""
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle"
+                      data-target="new-password"
+                      aria-label="Toggle password visibility"
+                    >
+                      <img
+                        src="./assets/images/icon-show-password.svg"
+                        alt=""
+                        class="icon-show"
+                      />
+                      <img
+                        src="./assets/images/icon-hide-password.svg"
+                        alt=""
+                        class="icon-hide"
+                      />
+                    </button>
+                  </div>
+                  <span class="form-hint">
+                    <img src="./assets/images/icon-info.svg" alt="" />
+                    At least 8 characters
+                  </span>
+                </div>
 
-  Old Password
+                <div class="form-group">
+                  <label for="confirm-password" class="form-label"
+                    >Confirm New Password</label
+                  >
+                  <div class="input-wrapper">
+                    <input
+                      type="password"
+                      id="confirm-password"
+                      class="form-input"
+                      placeholder=""
+                    />
+                    <button
+                      type="button"
+                      class="password-toggle"
+                      data-target="confirm-password"
+                      aria-label="Toggle password visibility"
+                    >
+                      <img
+                        src="./assets/images/icon-show-password.svg"
+                        alt=""
+                        class="icon-show"
+                      />
+                      <img
+                        src="./assets/images/icon-hide-password.svg"
+                        alt=""
+                        class="icon-hide"
+                      />
+                    </button>
+                  </div>
+                </div>
 
-  New Password
-  At least 8 characters
+                <button type="submit" class="btn btn-primary btn-apply">
+                  Save Password
+                </button>
+              </form>
+            </section>
+          </div>
+        </div>
+      </main>
 
-  Confirm New Password
+      <!-- ===== MOBILE BOTTOM NAV ===== -->
+      <nav class="mobile-nav">
+        <a href="index.html" class="mobile-nav-item" data-page="all-notes">
+          <img src="./assets/images/icon-home.svg" alt="" />
+          <span>Home</span>
+        </a>
+        <a href="index.html#search" class="mobile-nav-item" data-page="search">
+          <img src="./assets/images/icon-search.svg" alt="" />
+          <span>Search</span>
+        </a>
+        <a
+          href="index.html#archived"
+          class="mobile-nav-item"
+          data-page="archived"
+        >
+          <img src="./assets/images/icon-archive.svg" alt="" />
+          <span>Archived</span>
+        </a>
+        <a href="index.html#tags" class="mobile-nav-item" data-page="tags">
+          <img src="./assets/images/icon-tag.svg" alt="" />
+          <span>Tags</span>
+        </a>
+        <a href="#" class="mobile-nav-item active" data-page="settings">
+          <img src="./assets/images/icon-settings.svg" alt="" />
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
 
-  Save Password
-
-  <!-- Change password content end -->
-
-</body>
+    <!-- Appwrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@17.0.0"></script>
+    <script type="module" src="./scripts/settings.js"></script>
+  </body>
 </html>

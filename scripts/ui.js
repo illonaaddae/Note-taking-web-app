@@ -25,6 +25,13 @@ export function setCurrentNoteId(id) {
 }
 
 /**
+ * Clear current note ID
+ */
+export function clearCurrentNoteId() {
+  currentNoteId = null;
+}
+
+/**
  * Render a single note card
  * @param {Object} note - Note object
  * @returns {string} - HTML string
@@ -82,11 +89,23 @@ export function showNoteDetail(note) {
   const contentEl = document.getElementById("note-content");
   const tagsEl = document.getElementById("note-tags");
   const dateEl = document.getElementById("note-date");
+  const statusRow = document.getElementById("note-status-row");
+  const statusEl = document.getElementById("note-status");
 
   if (titleEl) titleEl.textContent = note.title || "";
   if (contentEl) contentEl.value = note.content || "";
   if (tagsEl) tagsEl.value = note.tags.join(", ") || "";
   if (dateEl) dateEl.textContent = formatDate(note.updatedAt);
+
+  // Show status row only for archived notes
+  if (statusRow && statusEl) {
+    if (note.archived) {
+      statusRow.classList.remove("hidden");
+      statusEl.textContent = "Archived";
+    } else {
+      statusRow.classList.add("hidden");
+    }
+  }
 
   // Focus on title if it's empty (new note)
   if (!note.title || note.title === "Untitled Note") {
@@ -111,7 +130,7 @@ export function clearNoteDetail() {
 
   if (titleEl) titleEl.textContent = "Select a note to view";
   if (contentEl) contentEl.value = "";
-  if (tagsEl) tagsEl.textContent = "-";
+  if (tagsEl) tagsEl.value = "";
   if (dateEl) dateEl.textContent = "-";
 
   // Hide detail section on mobile
@@ -201,5 +220,27 @@ export function toggleArchiveView() {
   if (pageTitle) {
     const isArchive = pageTitle.textContent.includes("Archived");
     pageTitle.textContent = isArchive ? "All Notes" : "Archived Notes";
+  }
+}
+
+/**
+ * Update archive button text based on note status
+ * @param {boolean} isArchived - Whether the note is archived
+ */
+export function updateArchiveButton(isArchived) {
+  const archiveBtn = document.getElementById("archive-note-btn");
+  if (!archiveBtn) return;
+
+  const img = archiveBtn.querySelector("img");
+  const span = archiveBtn.querySelector("span");
+
+  if (isArchived) {
+    // Show "Restore Note" for archived notes
+    if (img) img.src = "./assets/images/icon-restore.svg";
+    if (span) span.textContent = "Restore Note";
+  } else {
+    // Show "Archive Note" for active notes
+    if (img) img.src = "./assets/images/icon-archive.svg";
+    if (span) span.textContent = "Archive Note";
   }
 }

@@ -6,10 +6,21 @@
 import * as appwrite from "./appwrite.js";
 import * as noteManager from "./noteManager.js";
 import * as ui from "./ui.js";
-import { loadPreferences } from "./storage.js";
+import {
+  loadPreferences,
+  saveDraft,
+  loadDraft,
+  clearDraft,
+} from "./storage.js";
+import { initTheme } from "./theme.js";
 
 // Store notes in memory for quick access
 let notesCache = [];
+let currentUser = null;
+
+// Modal state
+let modalCallback = null;
+let currentView = "all-notes"; // Track current view state
 
 // Initialize app on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,6 +35,14 @@ async function init() {
     // Initialize Appwrite client
     appwrite.initAppwrite();
 
+    // Check if user is logged in
+    currentUser = await appwrite.getCurrentUser();
+
+    if (currentUser) {
+      console.log("Logged in as:", currentUser.email);
+      // Update UI to show user info if needed
+    }
+
     // Load notes from Appwrite
     notesCache = await appwrite.getAllNotes();
 
@@ -36,8 +55,11 @@ async function init() {
     // Set up event listeners
     setupEventListeners();
 
-    // Load saved preferences (theme, font - still from localStorage)
-    loadUserPreferences();
+    // Initialize theme system
+    initTheme();
+
+    // Check for unsaved draft and restore if exists
+    restoreDraft();
 
     console.log("Notes app initialized with Appwrite!");
   } catch (error) {
@@ -73,9 +95,34 @@ function setupEventListeners() {
   const deleteNoteBtn = document.getElementById("delete-note-btn");
   deleteNoteBtn?.addEventListener("click", handleDeleteNote);
 
-  // Search input
+  // Mobile buttons
+  const mobileBackBtn = document.getElementById("mobile-back-btn");
+  const mobileSaveBtn = document.getElementById("mobile-save-btn");
+  const mobileCancelBtn = document.getElementById("mobile-cancel-btn");
+  const mobileArchiveBtn = document.getElementById("mobile-archive-btn");
+  const mobileDeleteBtn = document.getElementById("mobile-delete-btn");
+
+  mobileBackBtn?.addEventListener("click", handleMobileBack);
+  mobileSaveBtn?.addEventListener("click", handleSaveNote);
+  mobileCancelBtn?.addEventListener("click", handleCancel);
+  mobileArchiveBtn?.addEventListener("click", handleArchiveNote);
+  mobileDeleteBtn?.addEventListener("click", handleDeleteNote);
+
+  // Search input (desktop)
   const searchInput = document.getElementById("search-input");
   searchInput?.addEventListener("input", handleSearch);
+
+  // Mobile search input
+  const mobileSearchInput = document.getElementById("mobile-search-input");
+  mobileSearchInput?.addEventListener("input", handleMobileSearch);
+
+  // Mobile search results click handler
+  const mobileSearchResults = document.getElementById("mobile-search-results");
+  mobileSearchResults?.addEventListener("click", handleNoteClick);
+
+  // Mobile tags list click handler
+  const mobileTagsList = document.getElementById("mobile-tags-list");
+  mobileTagsList?.addEventListener("click", handleMobileTagClick);
 
   // Notes list - event delegation
   const notesList = document.getElementById("notes-list");
@@ -89,6 +136,35 @@ function setupEventListeners() {
   document.querySelectorAll("[data-page]").forEach((item) => {
     item.addEventListener("click", handleNavClick);
   });
+
+  // Settings button
+  const settingsBtn = document.getElementById("settings-btn");
+  settingsBtn?.addEventListener("click", () => {
+    window.location.href = "settings.html";
+  });
+
+  // Modal event listeners
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modalCancel = document.getElementById("modal-cancel");
+  const modalConfirm = document.getElementById("modal-confirm");
+
+  modalOverlay?.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+  modalCancel?.addEventListener("click", closeModal);
+  modalConfirm?.addEventListener("click", handleModalConfirm);
+
+  // Keyboard navigation
+  document.addEventListener("keydown", handleKeyboardNav);
+
+  // Auto-save draft on input (sessionStorage)
+  const noteTitle = document.getElementById("note-title");
+  const noteContent = document.getElementById("note-content");
+  const noteTags = document.getElementById("note-tags");
+
+  noteTitle?.addEventListener("input", handleDraftAutoSave);
+  noteContent?.addEventListener("input", handleDraftAutoSave);
+  noteTags?.addEventListener("input", handleDraftAutoSave);
 }
 
 /**
@@ -112,6 +188,10 @@ async function handleCreateNote() {
     ui.showNoteDetail(newNote);
     ui.setActiveNote(newNote.id);
 
+    // On mobile, show the note detail section as overlay
+    const noteDetailSection = document.getElementById("note-detail");
+    noteDetailSection?.classList.add("active");
+
     ui.showToast("New note created!");
   } catch (error) {
     console.error("Failed to create note:", error);
@@ -124,7 +204,12 @@ async function handleCreateNote() {
  */
 async function handleSaveNote() {
   const noteId = ui.getCurrentNoteId();
-  if (!noteId) return;
+  console.log("Saving note with ID:", noteId);
+
+  if (!noteId) {
+    console.log("No note ID found, cannot save");
+    return;
+  }
 
   const title = document.getElementById("note-title")?.textContent || "";
   const content = document.getElementById("note-content")?.value || "";
@@ -134,6 +219,8 @@ async function handleSaveNote() {
     .map((t) => t.trim())
     .filter((t) => t);
 
+  console.log("Saving with data:", { title, content, tags });
+
   try {
     // Update note in Appwrite
     const updatedNote = await appwrite.updateNote(noteId, {
@@ -141,6 +228,8 @@ async function handleSaveNote() {
       content,
       tags,
     });
+
+    console.log("Note saved successfully:", updatedNote);
 
     // Update local cache
     const index = notesCache.findIndex((n) => n.id === noteId);
@@ -151,6 +240,10 @@ async function handleSaveNote() {
     // Update UI
     ui.renderAllNotes(notesCache.filter((n) => !n.archived));
     ui.updateTagList(noteManager.getAllTags(notesCache));
+
+    // Clear draft after successful save
+    clearDraft();
+
     ui.showToast("Note saved successfully!");
   } catch (error) {
     console.error("Failed to save note:", error);
@@ -169,32 +262,84 @@ function handleCancel() {
   if (note) {
     ui.showNoteDetail(note);
   }
+
+  // On mobile, also go back to the list
+  handleMobileBack();
+}
+
+/**
+ * Handle mobile back button - close note detail and return to list or search
+ */
+function handleMobileBack() {
+  const noteDetailSection = document.getElementById("note-detail");
+  noteDetailSection?.classList.remove("active");
+  ui.clearCurrentNoteId();
+
+  // If in search view, keep it visible
+  if (currentView === "search") {
+    const mobileSearchView = document.getElementById("mobile-search-view");
+    mobileSearchView?.classList.add("active");
+    mobileSearchView?.classList.remove("hidden");
+  }
+
+  // If in tags view, keep it visible
+  if (currentView === "tags") {
+    const mobileTagsView = document.getElementById("mobile-tags-view");
+    mobileTagsView?.classList.add("active");
+    mobileTagsView?.classList.remove("hidden");
+  }
 }
 
 /**
  * Handle archive note
  */
-async function handleArchiveNote() {
+function handleArchiveNote() {
   const noteId = ui.getCurrentNoteId();
   if (!noteId) return;
 
-  try {
-    const note = notesCache.find((n) => n.id === noteId);
-    const newArchivedStatus = !note.archived;
+  const note = notesCache.find((n) => n.id === noteId);
+  const isArchiving = !note.archived;
 
+  if (isArchiving) {
+    // Show archive confirmation modal
+    showModal({
+      icon: "archive",
+      title: "Archive Note",
+      message:
+        "Are you sure you want to archive this note? You can find it in the Archived Notes section and restore it anytime.",
+      confirmText: "Archive Note",
+      confirmClass: "btn-primary",
+      onConfirm: () => performArchive(noteId, true),
+    });
+  } else {
+    // Restore without confirmation
+    performArchive(noteId, false);
+  }
+}
+
+/**
+ * Perform the archive/restore operation
+ */
+async function performArchive(noteId, archive) {
+  try {
     // Update in Appwrite
-    await appwrite.archiveNote(noteId, newArchivedStatus);
+    await appwrite.archiveNote(noteId, archive);
 
     // Update local cache
     const index = notesCache.findIndex((n) => n.id === noteId);
     if (index !== -1) {
-      notesCache[index].archived = newArchivedStatus;
+      notesCache[index].archived = archive;
     }
 
-    // Update UI
-    ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+    // Update UI based on current view
+    if (currentView === "archived") {
+      ui.renderAllNotes(notesCache.filter((n) => n.archived));
+    } else {
+      ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+    }
     ui.clearNoteDetail();
-    ui.showToast(newArchivedStatus ? "Note archived!" : "Note restored!");
+    ui.updateArchiveButton(false); // Reset to default state
+    ui.showToast(archive ? "Note archived!" : "Note restored!");
   } catch (error) {
     console.error("Failed to archive note:", error);
     ui.showToast("Failed to archive note", "error");
@@ -204,46 +349,198 @@ async function handleArchiveNote() {
 /**
  * Handle delete note
  */
-async function handleDeleteNote() {
+function handleDeleteNote() {
   const noteId = ui.getCurrentNoteId();
   if (!noteId) return;
 
-  // TODO: Replace with custom modal
-  if (confirm("Are you sure you want to delete this note?")) {
-    try {
-      // Delete from Appwrite
-      await appwrite.deleteNote(noteId);
+  // Show delete confirmation modal
+  showModal({
+    icon: "delete",
+    title: "Delete Note",
+    message:
+      "Are you sure you want to permanently delete this note? This action cannot be undone.",
+    confirmText: "Delete Note",
+    confirmClass: "btn-danger",
+    onConfirm: () => performDelete(noteId),
+  });
+}
 
-      // Remove from local cache
-      notesCache = notesCache.filter((n) => n.id !== noteId);
+/**
+ * Perform the delete operation
+ */
+async function performDelete(noteId) {
+  try {
+    // Delete from Appwrite
+    await appwrite.deleteNote(noteId);
 
-      // Update UI
+    // Remove from local cache
+    notesCache = notesCache.filter((n) => n.id !== noteId);
+
+    // Update UI
+    if (currentView === "archived") {
+      ui.renderAllNotes(notesCache.filter((n) => n.archived));
+    } else {
       ui.renderAllNotes(notesCache.filter((n) => !n.archived));
-      ui.updateTagList(noteManager.getAllTags(notesCache));
-      ui.clearNoteDetail();
-      ui.showToast("Note deleted!");
-    } catch (error) {
-      console.error("Failed to delete note:", error);
-      ui.showToast("Failed to delete note", "error");
     }
+    ui.updateTagList(noteManager.getAllTags(notesCache));
+    ui.clearNoteDetail();
+    ui.showToast("Note deleted!");
+  } catch (error) {
+    console.error("Failed to delete note:", error);
+    ui.showToast("Failed to delete note", "error");
   }
 }
 
 /**
- * Handle search
+ * Handle search (desktop)
  */
 function handleSearch(e) {
   const query = e.target.value.trim();
+  const pageTitle = document.getElementById("page-title");
+  const searchInfo = document.getElementById("search-info");
 
   if (!query) {
     // Show all notes if search is empty
-    ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+    pageTitle.textContent =
+      currentView === "archived" ? "Archived Notes" : "All Notes";
+    searchInfo?.classList.add("hidden");
+    const notes =
+      currentView === "archived"
+        ? notesCache.filter((n) => n.archived)
+        : notesCache.filter((n) => !n.archived);
+    ui.renderAllNotes(notes);
     return;
+  }
+
+  // Update title to show search query
+  pageTitle.textContent = `Showing results for: ${query}`;
+
+  // Show search info message
+  if (searchInfo) {
+    searchInfo.textContent = `All notes with the "${query}" tag are shown here.`;
+    searchInfo.classList.remove("hidden");
   }
 
   // Search locally in cache (faster than API call for each keystroke)
   const filteredNotes = noteManager.searchNotes(notesCache, query);
   ui.renderAllNotes(filteredNotes.filter((n) => !n.archived));
+}
+
+/**
+ * Handle mobile search
+ */
+function handleMobileSearch(e) {
+  const query = e.target.value.trim();
+  const mobileSearchInfo = document.getElementById("mobile-search-info");
+  const mobileSearchResults = document.getElementById("mobile-search-results");
+
+  if (!query) {
+    // Clear results if search is empty
+    if (mobileSearchInfo) mobileSearchInfo.textContent = "";
+    if (mobileSearchResults) mobileSearchResults.innerHTML = "";
+    return;
+  }
+
+  // Update info message
+  if (mobileSearchInfo) {
+    mobileSearchInfo.textContent = `All notes matching "${query}" are displayed below.`;
+  }
+
+  // Search locally in cache
+  const filteredNotes = noteManager.searchNotes(notesCache, query);
+
+  // Render results in mobile search view
+  if (mobileSearchResults) {
+    mobileSearchResults.innerHTML = filteredNotes
+      .filter((n) => !n.archived)
+      .map((note) => renderMobileNoteCard(note))
+      .join("");
+  }
+}
+
+/**
+ * Render a note card for mobile search results
+ */
+function renderMobileNoteCard(note) {
+  const tagsHtml = note.tags
+    .map((tag) => `<span class="tag-badge">${tag}</span>`)
+    .join("");
+
+  const formattedDate = noteManager.formatDate(
+    note.updatedAt || note.createdAt
+  );
+
+  return `
+    <div class="note-card" data-note-id="${note.id}">
+      <h3 class="note-card-title">${note.title || "Untitled"}</h3>
+      <div class="note-card-tags">${tagsHtml}</div>
+      <span class="note-card-date">${formattedDate}</span>
+    </div>
+  `;
+}
+
+/**
+ * Render mobile tags list
+ */
+function renderMobileTagsList() {
+  const mobileTagsList = document.getElementById("mobile-tags-list");
+  if (!mobileTagsList) return;
+
+  const tags = noteManager.getAllTags(notesCache);
+
+  if (tags.length === 0) {
+    mobileTagsList.innerHTML = `
+      <div class="empty-state">
+        <p>No tags yet. Add tags to your notes to see them here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  mobileTagsList.innerHTML = tags
+    .map(
+      (tag) => `
+      <div class="mobile-tag-item" data-tag="${tag}">
+        <img src="./assets/images/icon-tag.svg" alt="" />
+        <span>${tag}</span>
+      </div>
+    `
+    )
+    .join("");
+}
+
+/**
+ * Handle mobile tag click
+ */
+function handleMobileTagClick(e) {
+  const tagItem = e.target.closest(".mobile-tag-item");
+  if (!tagItem) return;
+
+  const tag = tagItem.dataset.tag;
+  const filteredNotes = noteManager.filterByTag(notesCache, tag);
+
+  // Switch to all-notes view with filtered results
+  currentView = "all-notes";
+
+  // Hide tags view, show notes list
+  const mobileTagsView = document.getElementById("mobile-tags-view");
+  const notesListSection = document.querySelector(".notes-list-section");
+  const mainHeader = document.querySelector(".main-header");
+
+  mobileTagsView?.classList.remove("active");
+  mobileTagsView?.classList.add("hidden");
+  notesListSection?.classList.remove("hidden");
+  mainHeader?.classList.remove("hidden");
+
+  // Update page title and render filtered notes
+  document.getElementById("page-title").textContent = `Notes Tagged: ${tag}`;
+  ui.renderAllNotes(filteredNotes.filter((n) => !n.archived));
+
+  // Update nav active state
+  document.querySelectorAll("[data-page]").forEach((item) => {
+    item.classList.remove("active");
+  });
+  document.querySelector('[data-page="all-notes"]')?.classList.add("active");
 }
 
 /**
@@ -259,6 +556,11 @@ function handleNoteClick(e) {
   if (note) {
     ui.showNoteDetail(note);
     ui.setActiveNote(noteId);
+    ui.updateArchiveButton(note.archived);
+
+    // On mobile, show the note detail section as overlay
+    const noteDetailSection = document.getElementById("note-detail");
+    noteDetailSection?.classList.add("active");
   }
 }
 
@@ -295,21 +597,62 @@ function handleNavClick(e) {
     item.classList.remove("active");
   });
 
+  // Clear search input
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) searchInput.value = "";
+
+  // Hide search info
+  const searchInfo = document.getElementById("search-info");
+  searchInfo?.classList.add("hidden");
+
+  // Get view elements
+  const notesListSection = document.querySelector(".notes-list-section");
+  const mobileSearchView = document.getElementById("mobile-search-view");
+  const mainHeader = document.querySelector(".main-header");
+
+  // Hide mobile search view by default
+  mobileSearchView?.classList.remove("active");
+  mobileSearchView?.classList.add("hidden");
+
+  // Hide mobile tags view by default
+  const mobileTagsView = document.getElementById("mobile-tags-view");
+  mobileTagsView?.classList.remove("active");
+  mobileTagsView?.classList.add("hidden");
+
+  notesListSection?.classList.remove("hidden");
+
   switch (page) {
     case "all-notes":
+      currentView = "all-notes";
       document.getElementById("page-title").textContent = "All Notes";
       ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+      ui.clearNoteDetail();
       break;
     case "archived":
+      currentView = "archived";
       document.getElementById("page-title").textContent = "Archived Notes";
       ui.renderAllNotes(notesCache.filter((n) => n.archived));
+      ui.clearNoteDetail();
       break;
     case "search":
-      // Focus search input
-      document.getElementById("search-input")?.focus();
+      currentView = "search";
+      // Show mobile search view, hide notes list
+      notesListSection?.classList.add("hidden");
+      mobileSearchView?.classList.remove("hidden");
+      mobileSearchView?.classList.add("active");
+      mainHeader?.classList.add("hidden");
+      // Focus mobile search input
+      document.getElementById("mobile-search-input")?.focus();
       break;
     case "tags":
-      // Show tags view (could expand sidebar on mobile)
+      currentView = "tags";
+      // Show mobile tags view, hide notes list
+      notesListSection?.classList.add("hidden");
+      mobileTagsView?.classList.remove("hidden");
+      mobileTagsView?.classList.add("active");
+      mainHeader?.classList.add("hidden");
+      // Render tags list
+      renderMobileTagsList();
       break;
     case "settings":
       // Navigate to settings page
@@ -319,14 +662,195 @@ function handleNavClick(e) {
 }
 
 /**
- * Load user preferences from localStorage
+ * Show modal dialog
+ * @param {Object} options - Modal options
  */
-function loadUserPreferences() {
-  const prefs = loadPreferences();
-  if (prefs.theme) {
-    document.documentElement.setAttribute("data-theme", prefs.theme);
+function showModal({
+  icon,
+  title,
+  message,
+  confirmText,
+  confirmClass,
+  onConfirm,
+}) {
+  const overlay = document.getElementById("modal-overlay");
+  const modalIcon = document.getElementById("modal-icon");
+  const modalTitle = document.getElementById("modal-title");
+  const modalMessage = document.getElementById("modal-message");
+  const modalConfirm = document.getElementById("modal-confirm");
+
+  // Update modal content
+  modalIcon.innerHTML = `<img src="./assets/images/icon-${icon}.svg" alt="" />`;
+  modalIcon.className = icon === "delete" ? "modal-icon danger" : "modal-icon";
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  modalConfirm.textContent = confirmText;
+  modalConfirm.className = `btn ${confirmClass}`;
+
+  // Store callback
+  modalCallback = onConfirm;
+
+  // Show modal
+  overlay.classList.add("active");
+  overlay.setAttribute("aria-hidden", "false");
+
+  // Focus trap - focus the cancel button
+  document.getElementById("modal-cancel")?.focus();
+}
+
+/**
+ * Close modal dialog
+ */
+function closeModal() {
+  const overlay = document.getElementById("modal-overlay");
+  overlay.classList.remove("active");
+  overlay.setAttribute("aria-hidden", "true");
+  modalCallback = null;
+}
+
+/**
+ * Handle modal confirm button click
+ */
+function handleModalConfirm() {
+  if (modalCallback) {
+    modalCallback();
   }
-  if (prefs.font) {
-    document.documentElement.setAttribute("data-font", prefs.font);
+  closeModal();
+}
+
+/**
+ * Handle keyboard navigation
+ */
+function handleKeyboardNav(e) {
+  const modal = document.getElementById("modal-overlay");
+  const isModalOpen = modal?.classList.contains("active");
+
+  // Handle Escape key
+  if (e.key === "Escape") {
+    if (isModalOpen) {
+      closeModal();
+    } else {
+      // Cancel current edit
+      handleCancel();
+    }
+    return;
+  }
+
+  // Handle Enter key
+  if (e.key === "Enter") {
+    // If in modal, confirm on Enter (unless focused on cancel)
+    if (isModalOpen && document.activeElement?.id !== "modal-cancel") {
+      handleModalConfirm();
+      return;
+    }
+
+    // Save note on Ctrl/Cmd + Enter
+    if ((e.ctrlKey || e.metaKey) && !isModalOpen) {
+      handleSaveNote();
+      return;
+    }
+  }
+
+  // Arrow key navigation in notes list
+  if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !isModalOpen) {
+    const noteCards = document.querySelectorAll(".note-card");
+    const activeCard = document.querySelector(".note-card.active");
+
+    if (noteCards.length === 0) return;
+
+    let currentIndex = Array.from(noteCards).indexOf(activeCard);
+    if (currentIndex === -1) currentIndex = -1;
+
+    let newIndex;
+    if (e.key === "ArrowDown") {
+      newIndex = Math.min(currentIndex + 1, noteCards.length - 1);
+    } else {
+      newIndex = Math.max(currentIndex - 1, 0);
+    }
+
+    const newCard = noteCards[newIndex];
+    if (newCard) {
+      newCard.click();
+      newCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+}
+
+/**
+ * Auto-save draft to sessionStorage while typing
+ */
+function handleDraftAutoSave() {
+  const noteId = ui.getCurrentNoteId();
+  if (!noteId) return;
+
+  const title = document.getElementById("note-title")?.textContent || "";
+  const content = document.getElementById("note-content")?.value || "";
+  const tagsText = document.getElementById("note-tags")?.value || "";
+
+  const draft = {
+    noteId,
+    title,
+    content,
+    tags: tagsText,
+    timestamp: new Date().toISOString(),
+  };
+
+  saveDraft(draft);
+  console.log("Draft auto-saved to sessionStorage");
+}
+
+/**
+ * Restore draft from sessionStorage on page load
+ */
+function restoreDraft() {
+  const draft = loadDraft();
+  if (!draft) return;
+
+  // Check if draft is recent (within last 24 hours)
+  const draftTime = new Date(draft.timestamp);
+  const now = new Date();
+  const hoursDiff = (now - draftTime) / (1000 * 60 * 60);
+
+  if (hoursDiff > 24) {
+    clearDraft();
+    return;
+  }
+
+  // Find the note in cache
+  const note = notesCache.find((n) => n.id === draft.noteId);
+  if (!note) {
+    clearDraft();
+    return;
+  }
+
+  // Check if draft has unsaved changes
+  const hasChanges =
+    draft.title !== note.title ||
+    draft.content !== note.content ||
+    draft.tags !== note.tags.join(", ");
+
+  if (hasChanges) {
+    // Show toast and restore draft
+    ui.showToast("Restored unsaved draft", "info");
+
+    // Show the note with draft content
+    ui.showNoteDetail(note);
+    ui.setActiveNote(note.id);
+
+    // Restore draft content
+    setTimeout(() => {
+      const titleEl = document.getElementById("note-title");
+      const contentEl = document.getElementById("note-content");
+      const tagsEl = document.getElementById("note-tags");
+
+      if (titleEl) titleEl.textContent = draft.title;
+      if (contentEl) contentEl.value = draft.content;
+      if (tagsEl) tagsEl.value = draft.tags;
+    }, 100);
+
+    console.log("Draft restored from sessionStorage");
+  } else {
+    // No changes, clear the draft
+    clearDraft();
   }
 }
