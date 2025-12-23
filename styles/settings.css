@@ -503,9 +503,26 @@
   .settings-panels {
     display: none;
     padding: var(--space-4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 60px;
+    background-color: var(--neutral-0);
+    z-index: 100;
+    overflow-y: auto;
   }
 
   .settings-panels.active {
+    display: block;
+  }
+
+  .settings-panel {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .settings-panel.active {
     display: block;
   }
 
@@ -528,6 +545,23 @@
     height: 18px;
   }
 
+  /* Theme options spacing */
+  .theme-options {
+    margin-bottom: var(--space-6);
+  }
+
+  .option-content {
+    padding: var(--space-3);
+  }
+
+  .option-text {
+    min-width: 0;
+  }
+
+  .option-desc {
+    word-wrap: break-word;
+  }
+
   .btn-apply {
     width: auto;
     float: none;
@@ -539,7 +573,20 @@
     align-self: flex-end;
   }
 
+  /* Password form adjustments */
+  .password-form {
+    max-width: 100%;
+  }
+
+  .password-form .form-input {
+    width: 100%;
+  }
+
   [data-theme="dark"] .settings-content {
+    background-color: var(--neutral-950);
+  }
+
+  [data-theme="dark"] .settings-panels {
     background-color: var(--neutral-950);
   }
 
