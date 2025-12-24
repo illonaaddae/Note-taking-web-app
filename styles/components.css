@@ -302,7 +302,14 @@
 }
 
 .modal-actions .btn-primary {
-  width: auto;
+  background-color: var(--blue-500);
+  color: var(--neutral-0);
+  border: none;
+  border-radius: var(--radius-md);
+}
+
+.modal-actions .btn-primary:hover {
+  background-color: var(--blue-700);
 }
 
 /* Dark theme modal overrides */
