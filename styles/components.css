@@ -304,6 +304,7 @@
 }
 
 .modal-actions .btn-primary {
+  width: auto;
   background-color: var(--blue-500);
   color: var(--neutral-0);
   border: none;
