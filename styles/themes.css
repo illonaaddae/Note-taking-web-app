@@ -233,19 +233,7 @@
   opacity: 0.7;
 }
 
-/* Toast - Dark Theme */
-[data-theme="dark"] .toast {
-  background-color: var(--neutral-800);
-  color: var(--neutral-0);
-}
-
-[data-theme="dark"] .toast-success {
-  background-color: var(--green-500);
-}
-
-[data-theme="dark"] .toast-error {
-  background-color: var(--red-500);
-}
+/* Toast dark theme styles are in components.css */
 
 /* Mobile Nav - Dark Theme */
 [data-theme="dark"] .mobile-nav {

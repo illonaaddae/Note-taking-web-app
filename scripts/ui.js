@@ -229,24 +229,76 @@ export function setActiveTag(tag) {
  * Show toast notification
  * @param {string} message - Toast message
  * @param {string} type - "success", "error", "info"
+ * @param {Object} options - Optional action configuration
+ * @param {string} options.actionText - Text for action link
+ * @param {Function} options.actionCallback - Callback when action is clicked
  */
-export function showToast(message, type = "success") {
+export function showToast(message, type = "success", options = {}) {
+  // Remove any existing toast
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Determine icon based on type
+  const iconMap = {
+    success: "icon-checkmark-green.svg",
+    error: "icon-error.svg",
+    info: "icon-info.svg",
+  };
+  const iconSrc = `./assets/images/${iconMap[type] || iconMap.success}`;
+
   // Create toast element
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
-  toast.textContent = message;
+
+  // Build toast HTML structure
+  toast.innerHTML = `
+    <img class="toast-icon" src="${iconSrc}" alt="${type}" />
+    <div class="toast-content">
+      <span class="toast-message">${message}</span>
+      ${
+        options.actionText
+          ? `<a class="toast-action" href="#">${options.actionText}</a>`
+          : ""
+      }
+    </div>
+    <button class="toast-close" aria-label="Close">
+      <img src="./assets/images/icon-cross.svg" alt="Close" />
+    </button>
+  `;
 
   // Add to DOM
   document.body.appendChild(toast);
 
+  // Set up close button
+  const closeBtn = toast.querySelector(".toast-close");
+  closeBtn.addEventListener("click", () => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  });
+
+  // Set up action link if provided
+  if (options.actionText && options.actionCallback) {
+    const actionLink = toast.querySelector(".toast-action");
+    actionLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      options.actionCallback();
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    });
+  }
+
   // Animate in
   setTimeout(() => toast.classList.add("show"), 10);
 
-  // Remove after delay
+  // Auto-remove after delay
   setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
+    if (toast.parentNode) {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 4000);
 }
 
 /**

@@ -1230,37 +1230,8 @@
 
 /* ==============================
    Toast Notifications
+   Note: Main toast styles are in components.css
    ============================== */
-
-.toast {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background-color: var(--neutral-900);
-  color: var(--neutral-0);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.toast-success {
-  background-color: var(--success);
-}
-
-.toast-error {
-  background-color: var(--error);
-}
 
 /* ==============================
    Empty State

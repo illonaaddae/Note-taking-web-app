@@ -647,6 +647,36 @@ function handleMobileBack() {
 }
 
 /**
+ * Navigate to archived notes view (used by toast action)
+ */
+function handleViewArchived() {
+  currentView = "archived";
+  document.getElementById("page-title").textContent = "Archived Notes";
+  ui.renderAllNotes(notesCache.filter((n) => n.archived));
+  ui.clearNoteDetail();
+
+  // Update nav active state
+  document.querySelectorAll("[data-page]").forEach((item) => {
+    item.classList.toggle("active", item.dataset.page === "archived");
+  });
+}
+
+/**
+ * Navigate to all notes view (used by toast action)
+ */
+function handleViewAllNotes() {
+  currentView = "all-notes";
+  document.getElementById("page-title").textContent = "All Notes";
+  ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+  ui.clearNoteDetail();
+
+  // Update nav active state
+  document.querySelectorAll("[data-page]").forEach((item) => {
+    item.classList.toggle("active", item.dataset.page === "all-notes");
+  });
+}
+
+/**
  * Handle archive note
  */
 function handleArchiveNote() {
@@ -695,7 +725,19 @@ async function performArchive(noteId, archive) {
     }
     ui.clearNoteDetail();
     ui.updateArchiveButton(false); // Reset to default state
-    ui.showToast(archive ? "Note archived!" : "Note restored!");
+
+    // Show toast with action link
+    if (archive) {
+      ui.showToast("Note archived.", "success", {
+        actionText: "Archived Notes",
+        actionCallback: () => handleViewArchived(),
+      });
+    } else {
+      ui.showToast("Note restored to active notes.", "success", {
+        actionText: "All Notes",
+        actionCallback: () => handleViewAllNotes(),
+      });
+    }
   } catch (error) {
     console.error("Failed to archive note:", error);
     ui.showToast("Failed to archive note", "error");
@@ -740,7 +782,7 @@ async function performDelete(noteId) {
     }
     ui.updateTagList(noteManager.getAllTags(notesCache));
     ui.clearNoteDetail();
-    ui.showToast("Note deleted!");
+    ui.showToast("Note permanently deleted.");
   } catch (error) {
     console.error("Failed to delete note:", error);
     ui.showToast("Failed to delete note", "error");

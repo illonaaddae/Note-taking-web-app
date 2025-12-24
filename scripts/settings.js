@@ -197,7 +197,7 @@ function handleApplyColorTheme() {
 
   if (selectedTheme) {
     theme.applyTheme(selectedTheme);
-    showToast("Color theme updated!");
+    showToast("Settings updated successfully!");
   }
 }
 
@@ -211,7 +211,7 @@ function handleApplyFontTheme() {
 
   if (selectedFont) {
     theme.applyFont(selectedFont);
-    showToast("Font theme updated!");
+    showToast("Settings updated successfully!");
   }
 }
 
@@ -259,7 +259,7 @@ async function handlePasswordChange(e) {
   try {
     // Update password via Appwrite
     await updatePassword(newPassword, oldPassword);
-    showToast("Password updated successfully!");
+    showToast("Password changed successfully!");
 
     // Clear form
     e.target.reset();
@@ -309,22 +309,55 @@ function handleKeyboardNav(e) {
  * @param {string} type - "success" or "error"
  */
 function showToast(message, type = "success") {
+  // Remove any existing toast
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Determine icon based on type
+  const iconMap = {
+    success: "icon-checkmark-green.svg",
+    error: "icon-error.svg",
+    info: "icon-info.svg",
+  };
+  const iconSrc = `./assets/images/${iconMap[type] || iconMap.success}`;
+
   // Create toast element
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
-  toast.textContent = message;
+
+  // Build toast HTML structure
+  toast.innerHTML = `
+    <img class="toast-icon" src="${iconSrc}" alt="${type}" />
+    <div class="toast-content">
+      <span class="toast-message">${message}</span>
+    </div>
+    <button class="toast-close" aria-label="Close">
+      <img src="./assets/images/icon-cross.svg" alt="Close" />
+    </button>
+  `;
 
   // Add to DOM
   document.body.appendChild(toast);
 
+  // Set up close button
+  const closeBtn = toast.querySelector(".toast-close");
+  closeBtn.addEventListener("click", () => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  });
+
   // Animate in
   setTimeout(() => toast.classList.add("show"), 10);
 
-  // Remove after delay
+  // Auto-remove after delay
   setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
+    if (toast.parentNode) {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 4000);
 }
 
 // Initialize on DOM Ready
