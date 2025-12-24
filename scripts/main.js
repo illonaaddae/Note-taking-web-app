@@ -525,9 +525,9 @@ async function handleCreateNote() {
     console.log("Creating new note...");
     console.log("Current user:", currentUser);
 
-    // Create note in Appwrite
+    // Create note in Appwrite with empty title (placeholder shown in UI)
     const newNote = await appwrite.createNote({
-      title: "Untitled Note",
+      title: "",
       content: "",
       tags: [],
       archived: false,

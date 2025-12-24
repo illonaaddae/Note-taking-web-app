@@ -128,15 +128,25 @@ export async function getAllNotes() {
       return [];
     }
 
-    // Fetch notes - document-level permissions will filter to only user's notes
+    // Fetch all notes from database
     const response = await databases.listDocuments(
       CONFIG.databaseId,
       CONFIG.collectionId,
       [Query.orderDesc("$createdAt"), Query.limit(100)]
     );
 
+    // Filter notes to only show those belonging to current user
+    // Check the $permissions array for user-specific read permission
+    const userPermission = `read("user:${user.$id}")`;
+    const userNotes = response.documents.filter((doc) => {
+      // Check if user has explicit read permission on this document
+      return doc.$permissions && doc.$permissions.includes(userPermission);
+    });
+
+    console.log(`📝 Found ${userNotes.length} notes for user ${user.email}`);
+
     // Transform Appwrite documents to our note format
-    return response.documents.map((doc) => ({
+    return userNotes.map((doc) => ({
       id: doc.$id,
       title: doc.title,
       content: doc.content || "",
@@ -171,7 +181,9 @@ export async function createNote(note) {
       CONFIG.collectionId,
       ID.unique(),
       {
-        title: note.title || "Untitled Note",
+        // Use space character as placeholder for empty title (title is required in schema)
+        // UI will show "Enter a title..." placeholder via CSS when title is whitespace-only
+        title: note.title?.trim() || " ",
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,

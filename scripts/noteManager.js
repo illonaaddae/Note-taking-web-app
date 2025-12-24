@@ -33,7 +33,7 @@ export function createNote(title, content, tags = []) {
   const now = new Date().toISOString();
   return {
     id: generateId(),
-    title: title || "Untitled Note",
+    title: title || "",
     content: content || "",
     tags: tags,
     archived: false,

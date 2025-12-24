@@ -376,7 +376,13 @@ export async function getAllNotes() {
 // CREATE NOTE
 export async function createNote(note) {
   try {
-    const { ID } = window.Appwrite;
+    const { ID, Permission, Role } = window.Appwrite;
+
+    // Get current user to associate note with them (for permissions)
+    const user = await getCurrentUser();
+    if (!user) {
+      throw new Error("No user logged in, cannot create note");
+    }
 
     const response = await databases.createDocument(
       CONFIG.databaseId,
@@ -387,7 +393,14 @@ export async function createNote(note) {
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,
-      }
+      },
+      [
+        // Document-level permissions - only this user can access this note
+        // This ensures user isolation (users only see their own notes)
+        Permission.read(Role.user(user.$id)),
+        Permission.update(Role.user(user.$id)),
+        Permission.delete(Role.user(user.$id)),
+      ]
     );
 
     // Return in our note format
@@ -595,25 +608,90 @@ export function showNoteDetail(note) {
 ### Toast Notifications
 
 ```javascript
-export function showToast(message, type = "success") {
-  // Create toast element
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`; // Dynamic class
-  toast.textContent = message;
+/**
+ * Show toast notification with icon, action link, and close button
+ * @param {string} message - Toast message
+ * @param {string} type - "success", "error", "info"
+ * @param {Object} options - Optional action configuration
+ * @param {string} options.actionText - Text for action link (e.g., "Archived Notes")
+ * @param {Function} options.actionCallback - Callback when action is clicked
+ */
+export function showToast(message, type = "success", options = {}) {
+  // Remove any existing toast
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) {
+    existingToast.remove();
+  }
 
-  // Add to page
+  // Determine icon based on type (uses green checkmark for success)
+  const iconMap = {
+    success: "icon-checkmark-green.svg",
+    error: "icon-error.svg",
+    info: "icon-info.svg",
+  };
+  const iconSrc = `./assets/images/${iconMap[type] || iconMap.success}`;
+
+  // Create toast element with structured HTML
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+
+  // Build toast HTML structure matching Figma design
+  toast.innerHTML = `
+    <img class="toast-icon" src="${iconSrc}" alt="${type}" />
+    <div class="toast-content">
+      <span class="toast-message">${message}</span>
+      ${
+        options.actionText
+          ? `<a class="toast-action" href="#">${options.actionText}</a>`
+          : ""
+      }
+    </div>
+    <button class="toast-close" aria-label="Close">
+      <img src="./assets/images/icon-cross.svg" alt="Close" />
+    </button>
+  `;
+
+  // Add to DOM
   document.body.appendChild(toast);
 
-  // Animate in (CSS transition)
+  // Set up close button
+  const closeBtn = toast.querySelector(".toast-close");
+  closeBtn.addEventListener("click", () => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  });
+
+  // Set up action link if provided
+  if (options.actionText && options.actionCallback) {
+    const actionLink = toast.querySelector(".toast-action");
+    actionLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      options.actionCallback();
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    });
+  }
+
+  // Animate in
   setTimeout(() => toast.classList.add("show"), 10);
 
-  // Remove after 3 seconds
+  // Auto-remove after 4 seconds
   setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300); // Wait for fade-out animation
-  }, 3000);
+    if (toast.parentNode) {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 4000);
 }
+
+// Example usage with action link:
+ui.showToast("Note archived.", "success", {
+  actionText: "Archived Notes",
+  actionCallback: () => handleViewArchived(),
+});
 ```
+
+````
 
 ### Update UI Elements
 
@@ -648,7 +726,7 @@ export function setActiveNote(noteId) {
   const activeCard = document.querySelector(`[data-note-id="${noteId}"]`);
   activeCard?.classList.add("active"); // Optional chaining - won't error if null
 }
-```
+````
 
 ---
 
@@ -1155,25 +1233,62 @@ export async function login(email, password) {
 }
 ```
 
-### Google OAuth
+### Google OAuth (Token-based flow)
 
 ```javascript
+/**
+ * Log in with Google OAuth
+ * Uses OAuth2 Token flow (works on all browsers including iOS)
+ * This avoids third-party cookie issues by passing tokens in URL
+ */
 export function loginWithGoogle() {
   try {
     const acc = getAccount();
     const { OAuthProvider } = window.Appwrite;
 
-    // Where to redirect after auth
-    const successUrl = `${window.location.origin}/index.html`;
-    const failureUrl = `${window.location.origin}/auth/login.html?error=oauth_failed`;
+    // Get the base path of the app (handles subfolder deployments)
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.substring(
+      0,
+      currentPath.lastIndexOf("/auth/")
+    );
 
-    // Redirect to Google (Appwrite handles OAuth flow)
-    acc.createOAuth2Session(OAuthProvider.Google, successUrl, failureUrl);
+    // URLs for OAuth flow - tokens will be passed as URL parameters
+    const successUrl = `${window.location.origin}${basePath}/index.html`;
+    const failureUrl = `${window.location.origin}${basePath}/auth/login.html?error=oauth_failed`;
+
+    // Use createOAuth2Token instead of createOAuth2Session
+    // This returns userId and secret in URL, avoiding cookie issues on iOS/Safari
+    acc.createOAuth2Token(OAuthProvider.Google, successUrl, failureUrl);
   } catch (error) {
     throw error;
   }
 }
+
+/**
+ * Create a session from OAuth token parameters
+ * Call this after OAuth redirect to establish the session
+ * @param {string} userId - User ID from OAuth callback
+ * @param {string} secret - Secret token from OAuth callback
+ */
+export async function createSessionFromToken(userId, secret) {
+  try {
+    const acc = getAccount();
+    const session = await acc.createSession(userId, secret);
+    return { success: true, session };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
 ```
+
+**Why Token Flow Instead of Session Flow?**
+
+- `createOAuth2Session` relies on cookies, which are blocked by browser privacy features (especially on iOS Safari)
+- `createOAuth2Token` passes userId and secret as URL parameters instead
+- After redirect, `main.js` reads URL params and calls `createSessionFromToken()` to establish the session
+
+````
 
 ### Password Recovery
 
@@ -1206,7 +1321,7 @@ export async function resetPassword(userId, secret, newPassword) {
     return { success: false, error: getErrorMessage(error) };
   }
 }
-```
+````
 
 ### Error Message Helper
 
@@ -1488,6 +1603,21 @@ export function initLoginForm() {
 - Avoids deep nesting
 - Makes code more readable
 
+### 11. Document-Level Permissions (Appwrite)
+
+- Each note is created with permissions tied to the user
+- `Permission.read(Role.user(userId))` - only this user can read
+- `Permission.update(Role.user(userId))` - only this user can edit
+- `Permission.delete(Role.user(userId))` - only this user can delete
+- Ensures user isolation - users only see their own notes
+
+### 12. OAuth Token Flow
+
+- `createOAuth2Token` instead of `createOAuth2Session`
+- Avoids third-party cookie issues (especially on iOS Safari)
+- Tokens passed in URL parameters, then converted to session
+- More reliable across all browsers and privacy settings
+
 ---
 
 ## 📝 Common Interview Questions
@@ -1509,6 +1639,18 @@ A: Appwrite uses `$id`, `$createdAt` etc. We transform to our own schema (`id`, 
 
 **Q: What is the spread operator?**
 A: `...` syntax to spread array/object elements. Used for copying, merging, and immutable updates.
+
+**Q: How do you ensure users only see their own notes?**
+A: Using document-level permissions in Appwrite. When creating a note, we set `Permission.read(Role.user(userId))` so only that user can access it. This is more secure than filtering by userId because it's enforced at the database level.
+
+**Q: Why use OAuth2 Token flow instead of Session flow?**
+A: The session flow (`createOAuth2Session`) uses cookies, which are blocked by browser privacy features, especially on iOS Safari. The token flow (`createOAuth2Token`) passes credentials via URL parameters, then we create a session from those tokens. This works across all browsers.
+
+**Q: How does the toast notification system work?**
+A: We dynamically create a toast element with icon, message, optional action link, and close button. It animates in using CSS transitions, auto-removes after 4 seconds, and can be manually dismissed. Action links allow navigation (e.g., "Go to Archived Notes") directly from the toast.
+
+**Q: What is a confirmation modal and why use it?**
+A: A modal dialog that asks users to confirm destructive actions (delete, archive). Prevents accidental data loss. We use a custom modal instead of `window.confirm()` for better UX and consistent styling.
 
 ---
 

@@ -41,9 +41,16 @@ function renderNoteCard(note) {
     .map((tag) => `<span class="tag-badge">${tag}</span>`)
     .join("");
 
+  // Show "Untitled" with different styling if no title (or whitespace-only)
+  const trimmedTitle = note.title?.trim() || "";
+  const displayTitle = trimmedTitle || "Untitled";
+  const titleClass = trimmedTitle
+    ? "note-card-title"
+    : "note-card-title note-card-title--empty";
+
   return `
     <div class="note-card" data-note-id="${note.id}">
-      <h3 class="note-card-title">${note.title || "Untitled Note"}</h3>
+      <h3 class="${titleClass}">${displayTitle}</h3>
       <div class="note-card-tags">${tagsHtml}</div>
       <span class="note-card-date">${formatDate(note.updatedAt)}</span>
     </div>
@@ -93,7 +100,9 @@ export function showNoteDetail(note) {
   const statusRow = document.getElementById("note-status-row");
   const statusEl = document.getElementById("note-status");
 
-  if (titleEl) titleEl.textContent = note.title || "";
+  // Set title - trim whitespace and use empty string for CSS :empty placeholder to show
+  const displayTitle = note.title?.trim() || "";
+  if (titleEl) titleEl.textContent = displayTitle;
   if (contentEl) contentEl.value = note.content || "";
 
   // Update hidden tags input
@@ -141,8 +150,8 @@ export function showNoteDetail(note) {
     }
   }
 
-  // Focus on title if it's empty (new note)
-  if (!note.title || note.title === "Untitled Note") {
+  // Focus on title if it's empty or whitespace-only (new note)
+  if (!displayTitle) {
     titleEl?.focus();
   }
 

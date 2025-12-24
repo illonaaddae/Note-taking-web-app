@@ -341,6 +341,10 @@
   line-height: 1.4;
 }
 
+.note-card-title--empty {
+  color: var(--colors-neutral-950, #0e121b);
+}
+
 .note-card-tags {
   display: flex;
   flex-wrap: wrap;
@@ -473,7 +477,7 @@
 
 .note-title:empty::before {
   content: "Enter a title...";
-  color: var(--text-muted);
+  color: var(--colors-neutral-950, #0e121b);
 }
 
 /* Note Meta */
@@ -549,7 +553,7 @@
 }
 
 .tags-placeholder {
-  color: var(--text-muted);
+  color: var(--colors-neutral-700, #2b303b);
   font-size: var(--text-sm);
 }
 
@@ -735,7 +739,7 @@
 }
 
 .note-content textarea::placeholder {
-  color: var(--text-muted);
+  color: var(--colors-neutral-700, #2b303b);
 }
 
 /* Note Actions */
