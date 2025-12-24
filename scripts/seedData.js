@@ -77,7 +77,7 @@ const sampleNotes = [
 
 // Make this function available globally
 window.seedData = async function () {
-  const { Client, Databases, ID } = window.Appwrite;
+  const { Client, Databases, Account, ID, Permission, Role } = window.Appwrite;
 
   const client = new Client();
   client
@@ -85,17 +85,41 @@ window.seedData = async function () {
     .setProject("69430f2d001f367e2aca");
 
   const databases = new Databases(client);
+  const account = new Account(client);
+
+  // Get current user to set permissions
+  let user;
+  try {
+    user = await account.get();
+    console.log(`📧 Seeding notes for user: ${user.email} (${user.$id})`);
+  } catch (error) {
+    console.error(
+      "❌ You must be logged in to seed notes. Please login first."
+    );
+    return;
+  }
 
   console.log("🌱 Starting to seed data...");
 
   for (const note of sampleNotes) {
     try {
-      await databases.createDocument("notesdb", "notes", ID.unique(), {
-        title: note.title,
-        content: note.content,
-        tags: note.tags,
-        archived: note.archived,
-      });
+      await databases.createDocument(
+        "notesdb",
+        "notes",
+        ID.unique(),
+        {
+          title: note.title,
+          content: note.content,
+          tags: note.tags,
+          archived: note.archived,
+        },
+        [
+          // Set document-level permissions - only this user can access this note
+          Permission.read(Role.user(user.$id)),
+          Permission.update(Role.user(user.$id)),
+          Permission.delete(Role.user(user.$id)),
+        ]
+      );
       console.log(`✅ Created: ${note.title}`);
     } catch (error) {
       console.log(`⚠️ Skipped (may already exist): ${note.title}`);
@@ -105,4 +129,53 @@ window.seedData = async function () {
   console.log("🎉 Seeding complete! Refresh the page to see all notes.");
 };
 
-console.log("Seed script loaded. Run: await seedData()");
+// Function to delete all notes for the current user
+window.clearAllNotes = async function () {
+  const { Client, Databases, Account, Query } = window.Appwrite;
+
+  const client = new Client();
+  client
+    .setEndpoint("https://fra.cloud.appwrite.io/v1")
+    .setProject("69430f2d001f367e2aca");
+
+  const databases = new Databases(client);
+  const account = new Account(client);
+
+  // Get current user
+  let user;
+  try {
+    user = await account.get();
+    console.log(`📧 Clearing notes for user: ${user.email}`);
+  } catch (error) {
+    console.error("❌ You must be logged in to clear notes.");
+    return;
+  }
+
+  try {
+    // Get all notes
+    const response = await databases.listDocuments("notesdb", "notes", [
+      Query.limit(100),
+    ]);
+
+    console.log(`🗑️ Found ${response.documents.length} notes to delete...`);
+
+    for (const doc of response.documents) {
+      try {
+        await databases.deleteDocument("notesdb", "notes", doc.$id);
+        console.log(`✅ Deleted: ${doc.title}`);
+      } catch (error) {
+        console.log(
+          `⚠️ Could not delete: ${doc.title} (may not have permission)`
+        );
+      }
+    }
+
+    console.log("🎉 Clearing complete! Refresh the page.");
+  } catch (error) {
+    console.error("❌ Error clearing notes:", error);
+  }
+};
+
+console.log(
+  "Seed script loaded. Run: await seedData() or await clearAllNotes()"
+);
