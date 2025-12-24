@@ -1283,8 +1283,9 @@
 
 /* Empty state info box - matches Figma design */
 .empty-state-info {
-  background-color: var(--brand-soft);
-  border-radius: var(--radius-lg);
+  background: var(--neutral-100, #f3f5f8);
+  border: 1px solid var(--neutral-200, #e0e4ea);
+  border-radius: 8px;
   padding: var(--space-4);
   margin: var(--space-2);
 }
@@ -1297,5 +1298,6 @@
 }
 
 [data-theme="dark"] .empty-state-info {
-  background-color: var(--brand-soft);
+  background: var(--neutral-800);
+  border-color: var(--neutral-700);
 }
