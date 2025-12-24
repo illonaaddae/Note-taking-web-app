@@ -66,7 +66,7 @@ export async function getCurrentUser() {
     const user = await account.get();
     return user;
   } catch (error) {
-    // User is not logged in
+    // User is not logged in - this is not an error, just return null
     return null;
   }
 }

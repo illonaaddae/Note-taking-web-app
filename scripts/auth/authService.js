@@ -111,9 +111,19 @@ export function loginWithGoogle() {
     const acc = getAccount();
     const { OAuthProvider } = window.Appwrite;
 
-    // URLs for OAuth flow
-    const successUrl = `${window.location.origin}/index.html`;
-    const failureUrl = `${window.location.origin}/auth/login.html?error=oauth_failed`;
+    // Get the base path of the app (handles subfolder deployments)
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.substring(
+      0,
+      currentPath.lastIndexOf("/auth/")
+    );
+
+    // URLs for OAuth flow - add oauth=success marker for reliable callback detection
+    const successUrl = `${window.location.origin}${basePath}/index.html?oauth=success`;
+    const failureUrl = `${window.location.origin}${basePath}/auth/login.html?error=oauth_failed`;
+
+    console.log("OAuth success URL:", successUrl);
+    console.log("OAuth failure URL:", failureUrl);
 
     // Redirect to Google OAuth
     acc.createOAuth2Session(OAuthProvider.Google, successUrl, failureUrl);

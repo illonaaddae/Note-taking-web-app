@@ -28,6 +28,60 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
+ * Check if we're returning from an OAuth callback
+ */
+function isOAuthCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Check for our oauth=success marker (most reliable)
+  if (urlParams.has("oauth") && urlParams.get("oauth") === "success") {
+    return true;
+  }
+
+  // Check if referrer indicates OAuth flow
+  const referrer = document.referrer;
+  const isFromAppwrite =
+    referrer.includes("appwrite.io") ||
+    referrer.includes("accounts.google.com");
+
+  // Also check URL for any other OAuth indicators
+  const hasAuthParams = urlParams.has("userId") || urlParams.has("secret");
+
+  return isFromAppwrite || hasAuthParams;
+}
+
+/**
+ * Get current user with retry for OAuth callbacks
+ * OAuth redirects may need a moment for session to be ready
+ */
+async function getCurrentUserWithRetry(maxRetries = 5, delayMs = 800) {
+  const fromOAuth = isOAuthCallback();
+
+  // If coming from OAuth, use longer delays
+  if (fromOAuth) {
+    console.log("Detected OAuth callback, using extended retry...");
+    maxRetries = 8;
+    delayMs = 1000;
+  }
+
+  for (let i = 0; i < maxRetries; i++) {
+    console.log(`Auth check attempt ${i + 1}/${maxRetries}...`);
+    const user = await appwrite.getCurrentUser();
+    if (user) {
+      console.log("User found:", user.email);
+      return user;
+    }
+    // Wait before retrying (helps with OAuth callback timing)
+    if (i < maxRetries - 1) {
+      console.log(`Waiting ${delayMs}ms before retry...`);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  console.log("No user found after all retries");
+  return null;
+}
+
+/**
  * Initialize the application
  */
 async function init() {
@@ -35,13 +89,37 @@ async function init() {
     // Initialize Appwrite client
     appwrite.initAppwrite();
 
-    // Check if user is logged in
-    currentUser = await appwrite.getCurrentUser();
-
-    if (currentUser) {
-      console.log("Logged in as:", currentUser.email);
-      // Update UI to show user info if needed
+    // Check if this is an OAuth callback
+    const fromOAuth = isOAuthCallback();
+    if (fromOAuth) {
+      console.log("🔐 OAuth callback detected! Waiting for session...");
+      // Clean up the URL (remove oauth parameter)
+      const url = new URL(window.location.href);
+      url.searchParams.delete("oauth");
+      window.history.replaceState({}, document.title, url.pathname);
     }
+
+    // Check if user is logged in (with retry for OAuth callback)
+    currentUser = await getCurrentUserWithRetry();
+
+    if (!currentUser) {
+      // If came from OAuth but no session, show helpful message
+      if (fromOAuth) {
+        console.log(
+          "⚠️ OAuth completed but session not found. This may be a cookie issue."
+        );
+        // Redirect with a message parameter
+        window.location.href = "auth/login.html?error=oauth_session_failed";
+        return;
+      }
+      // Redirect to login page if not logged in
+      console.log("User not logged in, redirecting to login page...");
+      window.location.href = "auth/login.html";
+      return;
+    }
+
+    console.log("✅ Logged in as:", currentUser.email);
+    // Update UI to show user info if needed
 
     // Load notes from Appwrite
     notesCache = await appwrite.getAllNotes();
@@ -165,6 +243,286 @@ function setupEventListeners() {
   noteTitle?.addEventListener("input", handleDraftAutoSave);
   noteContent?.addEventListener("input", handleDraftAutoSave);
   noteTags?.addEventListener("input", handleDraftAutoSave);
+
+  // Tags selector event listeners
+  setupTagsSelector();
+}
+
+/**
+ * Set up tags selector (Mac Notes style checkboxes)
+ */
+function setupTagsSelector() {
+  const tagsSelected = document.getElementById("tags-selected");
+  const tagsDropdown = document.getElementById("tags-dropdown");
+  const tagsSearchInput = document.getElementById("tags-search-input");
+  const btnAddTag = document.getElementById("btn-add-tag");
+
+  if (!tagsSelected || !tagsDropdown) return;
+
+  // Toggle dropdown on click
+  tagsSelected.addEventListener("click", (e) => {
+    if (e.target.classList.contains("tag-remove")) return;
+    toggleTagsDropdown();
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    const tagsSelector = document.getElementById("tags-selector");
+    if (tagsSelector && !tagsSelector.contains(e.target)) {
+      closeTagsDropdown();
+    }
+  });
+
+  // Filter tags on search input
+  tagsSearchInput?.addEventListener("input", (e) => {
+    filterTagsDropdown(e.target.value);
+  });
+
+  // Add new tag button
+  btnAddTag?.addEventListener("click", () => {
+    const searchValue = tagsSearchInput?.value.trim();
+    if (searchValue) {
+      addNewTag(searchValue);
+      tagsSearchInput.value = "";
+    }
+  });
+
+  // Enter key to add new tag
+  tagsSearchInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const searchValue = tagsSearchInput.value.trim();
+      if (searchValue) {
+        addNewTag(searchValue);
+        tagsSearchInput.value = "";
+      }
+    }
+  });
+
+  // Tag dropdown item click (delegation)
+  const tagsDropdownList = document.getElementById("tags-dropdown-list");
+  tagsDropdownList?.addEventListener("click", (e) => {
+    const item = e.target.closest(".tags-dropdown-item");
+    if (item) {
+      const tag = item.dataset.tag;
+      toggleTag(tag);
+    }
+  });
+
+  // Listen for removeTag events from ui.js
+  window.addEventListener("removeTag", (e) => {
+    const tag = e.detail.tag;
+    if (tag) {
+      removeTag(tag);
+    }
+  });
+}
+
+/**
+ * Toggle tags dropdown visibility
+ */
+function toggleTagsDropdown() {
+  const tagsDropdown = document.getElementById("tags-dropdown");
+  const isHidden = tagsDropdown?.classList.contains("hidden");
+
+  if (isHidden) {
+    openTagsDropdown();
+  } else {
+    closeTagsDropdown();
+  }
+}
+
+/**
+ * Open tags dropdown
+ */
+function openTagsDropdown() {
+  const tagsDropdown = document.getElementById("tags-dropdown");
+  const tagsSearchInput = document.getElementById("tags-search-input");
+
+  tagsDropdown?.classList.remove("hidden");
+  renderTagsDropdown();
+  tagsSearchInput?.focus();
+}
+
+/**
+ * Close tags dropdown
+ */
+function closeTagsDropdown() {
+  const tagsDropdown = document.getElementById("tags-dropdown");
+  tagsDropdown?.classList.add("hidden");
+}
+
+/**
+ * Render tags dropdown with checkboxes
+ */
+function renderTagsDropdown(filterQuery = "") {
+  const tagsDropdownList = document.getElementById("tags-dropdown-list");
+  if (!tagsDropdownList) return;
+
+  // Get all unique tags from notes cache
+  const allTags = noteManager.getAllTags(notesCache);
+
+  // Get currently selected tags for this note
+  const selectedTags = getSelectedTags();
+
+  // Filter tags if there's a search query
+  const filteredTags = filterQuery
+    ? allTags.filter((tag) =>
+        tag.toLowerCase().includes(filterQuery.toLowerCase())
+      )
+    : allTags;
+
+  if (filteredTags.length === 0 && !filterQuery) {
+    tagsDropdownList.innerHTML = `
+      <div class="tags-dropdown-empty">
+        No tags yet. Create your first tag!
+      </div>
+    `;
+    return;
+  }
+
+  if (filteredTags.length === 0 && filterQuery) {
+    tagsDropdownList.innerHTML = `
+      <div class="tags-dropdown-empty">
+        No matching tags. Press Enter to create "${filterQuery}".
+      </div>
+    `;
+    return;
+  }
+
+  tagsDropdownList.innerHTML = filteredTags
+    .map((tag) => {
+      const isSelected = selectedTags.includes(tag);
+      return `
+        <div class="tags-dropdown-item ${
+          isSelected ? "selected" : ""
+        }" data-tag="${tag}">
+          <span class="tag-checkbox"></span>
+          <span class="tag-name">${tag}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+/**
+ * Filter tags dropdown based on search query
+ */
+function filterTagsDropdown(query) {
+  renderTagsDropdown(query);
+
+  // Update "Create new tag" button text
+  const btnAddTag = document.getElementById("btn-add-tag");
+  if (btnAddTag) {
+    const span = btnAddTag.querySelector("span");
+    if (span) {
+      span.textContent = query ? `Create "${query}"` : "Create new tag";
+    }
+  }
+}
+
+/**
+ * Get currently selected tags from UI
+ */
+function getSelectedTags() {
+  const hiddenInput = document.getElementById("note-tags");
+  const value = hiddenInput?.value || "";
+  return value
+    .split(",")
+    .map((t) => t.trim())
+    .filter((t) => t);
+}
+
+/**
+ * Set selected tags in UI
+ */
+function setSelectedTags(tags) {
+  const hiddenInput = document.getElementById("note-tags");
+  const tagsSelected = document.getElementById("tags-selected");
+
+  if (hiddenInput) {
+    hiddenInput.value = tags.join(", ");
+  }
+
+  if (tagsSelected) {
+    if (tags.length === 0) {
+      tagsSelected.innerHTML = `<span class="tags-placeholder">Add tags...</span>`;
+    } else {
+      tagsSelected.innerHTML = tags
+        .map(
+          (tag) => `
+          <span class="tag-chip" data-tag="${tag}">
+            ${tag}
+            <button type="button" class="tag-remove" data-tag="${tag}">&times;</button>
+          </span>
+        `
+        )
+        .join("");
+
+      // Add click handlers for remove buttons
+      tagsSelected.querySelectorAll(".tag-remove").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const tagToRemove = btn.dataset.tag;
+          removeTag(tagToRemove);
+        });
+      });
+    }
+  }
+
+  // Trigger draft auto-save
+  handleDraftAutoSave();
+}
+
+/**
+ * Toggle a tag selection
+ */
+function toggleTag(tag) {
+  const selectedTags = getSelectedTags();
+  const index = selectedTags.indexOf(tag);
+
+  if (index === -1) {
+    selectedTags.push(tag);
+  } else {
+    selectedTags.splice(index, 1);
+  }
+
+  setSelectedTags(selectedTags);
+  renderTagsDropdown();
+}
+
+/**
+ * Remove a tag
+ */
+function removeTag(tag) {
+  const selectedTags = getSelectedTags();
+  const index = selectedTags.indexOf(tag);
+
+  if (index !== -1) {
+    selectedTags.splice(index, 1);
+    setSelectedTags(selectedTags);
+    renderTagsDropdown();
+  }
+}
+
+/**
+ * Add a new tag
+ */
+function addNewTag(tagName) {
+  const selectedTags = getSelectedTags();
+
+  // Clean up the tag name
+  const cleanTag = tagName.trim();
+  if (!cleanTag) return;
+
+  // Check if tag already exists in selection
+  if (!selectedTags.includes(cleanTag)) {
+    selectedTags.push(cleanTag);
+    setSelectedTags(selectedTags);
+  }
+
+  renderTagsDropdown();
+  closeTagsDropdown();
 }
 
 /**

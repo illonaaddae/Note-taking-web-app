@@ -153,6 +153,12 @@ export function initLoginForm() {
   if (urlParams.get("error") === "oauth_failed") {
     showFormError(form, "Google sign-in failed. Please try again.");
   }
+  if (urlParams.get("error") === "oauth_session_failed") {
+    showFormError(
+      form,
+      "Google sign-in completed but session could not be established. This may be due to browser cookie settings. Please try email/password login or use a different browser."
+    );
+  }
 }
 
 // ============================================

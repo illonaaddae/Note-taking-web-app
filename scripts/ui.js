@@ -88,13 +88,47 @@ export function showNoteDetail(note) {
   const titleEl = document.getElementById("note-title");
   const contentEl = document.getElementById("note-content");
   const tagsEl = document.getElementById("note-tags");
+  const tagsSelected = document.getElementById("tags-selected");
   const dateEl = document.getElementById("note-date");
   const statusRow = document.getElementById("note-status-row");
   const statusEl = document.getElementById("note-status");
 
   if (titleEl) titleEl.textContent = note.title || "";
   if (contentEl) contentEl.value = note.content || "";
+
+  // Update hidden tags input
   if (tagsEl) tagsEl.value = note.tags.join(", ") || "";
+
+  // Update tags selector UI (Mac Notes style)
+  if (tagsSelected) {
+    if (note.tags && note.tags.length > 0) {
+      tagsSelected.innerHTML = note.tags
+        .map(
+          (tag) => `
+          <span class="tag-chip" data-tag="${tag}">
+            ${tag}
+            <button type="button" class="tag-remove" data-tag="${tag}">&times;</button>
+          </span>
+        `
+        )
+        .join("");
+
+      // Add click handlers for remove buttons
+      tagsSelected.querySelectorAll(".tag-remove").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const tagToRemove = btn.dataset.tag;
+          // Dispatch a custom event to be handled by main.js
+          window.dispatchEvent(
+            new CustomEvent("removeTag", { detail: { tag: tagToRemove } })
+          );
+        });
+      });
+    } else {
+      tagsSelected.innerHTML = `<span class="tags-placeholder">Add tags...</span>`;
+    }
+  }
+
   if (dateEl) dateEl.textContent = formatDate(note.updatedAt);
 
   // Show status row only for archived notes
@@ -126,11 +160,14 @@ export function clearNoteDetail() {
   const titleEl = document.getElementById("note-title");
   const contentEl = document.getElementById("note-content");
   const tagsEl = document.getElementById("note-tags");
+  const tagsSelected = document.getElementById("tags-selected");
   const dateEl = document.getElementById("note-date");
 
   if (titleEl) titleEl.textContent = "Select a note to view";
   if (contentEl) contentEl.value = "";
   if (tagsEl) tagsEl.value = "";
+  if (tagsSelected)
+    tagsSelected.innerHTML = `<span class="tags-placeholder">Add tags...</span>`;
   if (dateEl) dateEl.textContent = "-";
 
   // Hide detail section on mobile

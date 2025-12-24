@@ -180,19 +180,43 @@
 
             <!-- Note Meta -->
             <div class="note-meta">
-              <div class="meta-item">
+              <div class="meta-item meta-item-tags">
                 <img
                   src="./assets/images/icon-tag.svg"
                   alt=""
                   class="meta-icon"
                 />
                 <span class="meta-label">Tags</span>
-                <input
-                  type="text"
-                  class="meta-input"
-                  id="note-tags"
-                  placeholder="Add tags (comma separated)"
-                />
+                <div class="tags-selector" id="tags-selector">
+                  <div class="tags-selected" id="tags-selected">
+                    <span class="tags-placeholder">Add tags...</span>
+                  </div>
+                  <div class="tags-dropdown hidden" id="tags-dropdown">
+                    <div class="tags-dropdown-header">
+                      <input
+                        type="text"
+                        class="tags-search-input"
+                        id="tags-search-input"
+                        placeholder="Search or create tag..."
+                      />
+                    </div>
+                    <div class="tags-dropdown-list" id="tags-dropdown-list">
+                      <!-- Tags will be dynamically populated -->
+                    </div>
+                    <div class="tags-dropdown-footer">
+                      <button
+                        type="button"
+                        class="btn-add-tag"
+                        id="btn-add-tag"
+                      >
+                        <img src="./assets/images/icon-plus.svg" alt="" />
+                        <span>Create new tag</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Hidden input to maintain compatibility -->
+                <input type="hidden" id="note-tags" />
               </div>
               <div class="meta-item meta-status hidden" id="note-status-row">
                 <img

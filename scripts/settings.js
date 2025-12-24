@@ -11,20 +11,34 @@ import {
   getCurrentUser,
   logout,
   updatePassword,
+  getAllNotes,
 } from "./appwrite.js";
+import { getAllTags } from "./noteManager.js";
 
 /**
  * Initialize settings page
  */
-function init() {
+async function init() {
   // Initialize Appwrite
   initAppwrite();
+
+  // Check if user is logged in
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    // Redirect to login page if not logged in
+    console.log("User not logged in, redirecting to login page...");
+    window.location.href = "auth/login.html";
+    return;
+  }
 
   // Initialize theme (applies saved preferences)
   theme.initTheme();
 
   // Load and apply saved preferences to UI
   loadSavedPreferences();
+
+  // Load notes and display tags in sidebar
+  await loadAndDisplayTags();
 
   // Set up event listeners
   setupEventListeners();
@@ -52,6 +66,39 @@ function loadSavedPreferences() {
   );
   if (fontThemeRadio) {
     fontThemeRadio.checked = true;
+  }
+}
+
+/**
+ * Load notes and display tags in sidebar
+ */
+async function loadAndDisplayTags() {
+  try {
+    const notes = await getAllNotes();
+    const tags = getAllTags(notes);
+
+    const tagsList = document.getElementById("sidebar-tags");
+    if (!tagsList) return;
+
+    if (tags.length === 0) {
+      tagsList.innerHTML = `<li class="tag-item empty">No tags yet</li>`;
+      return;
+    }
+
+    const tagsHtml = tags
+      .map(
+        (tag) => `
+        <li class="tag-item" data-tag="${tag}">
+          <img src="assets/images/icon-tag.svg" alt="" />
+          <span>${tag}</span>
+        </li>
+      `
+      )
+      .join("");
+
+    tagsList.innerHTML = tagsHtml;
+  } catch (error) {
+    console.error("Failed to load tags:", error);
   }
 }
 
