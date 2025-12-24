@@ -121,21 +121,18 @@ export async function getAllNotes() {
   try {
     const { Query } = window.Appwrite;
 
-    // Get current user to filter notes
+    // Get current user
     const user = await getCurrentUser();
     if (!user) {
       console.error("No user logged in, cannot fetch notes");
       return [];
     }
 
+    // Fetch notes - document-level permissions will filter to only user's notes
     const response = await databases.listDocuments(
       CONFIG.databaseId,
       CONFIG.collectionId,
-      [
-        Query.equal("userId", user.$id), // Only get notes for this user
-        Query.orderDesc("$createdAt"),
-        Query.limit(100),
-      ]
+      [Query.orderDesc("$createdAt"), Query.limit(100)]
     );
 
     // Transform Appwrite documents to our note format
@@ -178,7 +175,6 @@ export async function createNote(note) {
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,
-        userId: user.$id, // Associate note with current user
       },
       [
         // Set document-level permissions - only this user can access this note
