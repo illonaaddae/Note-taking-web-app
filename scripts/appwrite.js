@@ -114,17 +114,28 @@ export async function updatePassword(newPassword, oldPassword) {
 // ============================================
 
 /**
- * Get all notes from Appwrite database
- * @returns {Promise<Array>} - Array of note objects
+ * Get all notes from Appwrite database for the current user
+ * @returns {Promise<Array>} - Array of note objects belonging to current user
  */
 export async function getAllNotes() {
   try {
     const { Query } = window.Appwrite;
 
+    // Get current user to filter notes
+    const user = await getCurrentUser();
+    if (!user) {
+      console.error("No user logged in, cannot fetch notes");
+      return [];
+    }
+
     const response = await databases.listDocuments(
       CONFIG.databaseId,
       CONFIG.collectionId,
-      [Query.orderDesc("$createdAt"), Query.limit(100)]
+      [
+        Query.equal("userId", user.$id), // Only get notes for this user
+        Query.orderDesc("$createdAt"),
+        Query.limit(100),
+      ]
     );
 
     // Transform Appwrite documents to our note format
@@ -152,6 +163,12 @@ export async function createNote(note) {
   try {
     const { ID } = window.Appwrite;
 
+    // Get current user to associate note with them
+    const user = await getCurrentUser();
+    if (!user) {
+      throw new Error("No user logged in, cannot create note");
+    }
+
     const response = await databases.createDocument(
       CONFIG.databaseId,
       CONFIG.collectionId,
@@ -161,6 +178,7 @@ export async function createNote(note) {
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,
+        userId: user.$id, // Associate note with current user
       }
     );
 
