@@ -68,8 +68,8 @@ export function renderAllNotes(notes) {
 
   if (filteredNotes.length === 0) {
     notesList.innerHTML = `
-      <div class="empty-state">
-        <p>No notes yet. Create your first note!</p>
+      <div class="empty-state-info">
+        <p>You don't have any notes yet. Start a new note to capture your thoughts and ideas.</p>
       </div>
     `;
     return;
