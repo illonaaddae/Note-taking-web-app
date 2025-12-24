@@ -522,6 +522,9 @@ function addNewTag(tagName) {
  */
 async function handleCreateNote() {
   try {
+    console.log("Creating new note...");
+    console.log("Current user:", currentUser);
+
     // Create note in Appwrite
     const newNote = await appwrite.createNote({
       title: "Untitled Note",
@@ -529,6 +532,8 @@ async function handleCreateNote() {
       tags: [],
       archived: false,
     });
+
+    console.log("Note created successfully:", newNote);
 
     // Add to local cache
     notesCache.unshift(newNote);
@@ -545,6 +550,7 @@ async function handleCreateNote() {
     ui.showToast("New note created!");
   } catch (error) {
     console.error("Failed to create note:", error);
+    console.error("Error details:", error.message, error.code, error.type);
     ui.showToast("Failed to create note", "error");
   }
 }
