@@ -161,7 +161,7 @@ export async function getAllNotes() {
  */
 export async function createNote(note) {
   try {
-    const { ID } = window.Appwrite;
+    const { ID, Permission, Role } = window.Appwrite;
 
     // Get current user to associate note with them
     const user = await getCurrentUser();
@@ -179,7 +179,13 @@ export async function createNote(note) {
         tags: note.tags || [],
         archived: note.archived || false,
         userId: user.$id, // Associate note with current user
-      }
+      },
+      [
+        // Set document-level permissions - only this user can access this note
+        Permission.read(Role.user(user.$id)),
+        Permission.update(Role.user(user.$id)),
+        Permission.delete(Role.user(user.$id)),
+      ]
     );
 
     return {
