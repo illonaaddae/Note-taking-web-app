@@ -104,7 +104,8 @@ export async function login(email, password) {
 
 /**
  * Log in with Google OAuth
- * Redirects user to Google for authentication
+ * Uses OAuth2 Token flow (works on all browsers including iOS)
+ * This avoids third-party cookie issues by passing tokens in URL
  */
 export function loginWithGoogle() {
   try {
@@ -118,18 +119,38 @@ export function loginWithGoogle() {
       currentPath.lastIndexOf("/auth/")
     );
 
-    // URLs for OAuth flow - add oauth=success marker for reliable callback detection
-    const successUrl = `${window.location.origin}${basePath}/index.html?oauth=success`;
+    // URLs for OAuth flow - tokens will be passed as URL parameters
+    const successUrl = `${window.location.origin}${basePath}/index.html`;
     const failureUrl = `${window.location.origin}${basePath}/auth/login.html?error=oauth_failed`;
 
     console.log("OAuth success URL:", successUrl);
     console.log("OAuth failure URL:", failureUrl);
 
-    // Redirect to Google OAuth
-    acc.createOAuth2Session(OAuthProvider.Google, successUrl, failureUrl);
+    // Use createOAuth2Token instead of createOAuth2Session
+    // This returns userId and secret in URL, avoiding cookie issues
+    acc.createOAuth2Token(OAuthProvider.Google, successUrl, failureUrl);
   } catch (error) {
     console.error("Google OAuth error:", error);
     throw error;
+  }
+}
+
+/**
+ * Create a session from OAuth token parameters
+ * Call this after OAuth redirect to establish the session
+ * @param {string} userId - User ID from OAuth callback
+ * @param {string} secret - Secret token from OAuth callback
+ * @returns {Promise<Object>} - Session result
+ */
+export async function createSessionFromToken(userId, secret) {
+  try {
+    const acc = getAccount();
+    const session = await acc.createSession(userId, secret);
+    console.log("Session created from OAuth token:", session);
+    return { success: true, session };
+  } catch (error) {
+    console.error("Failed to create session from token:", error);
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 

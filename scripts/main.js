@@ -28,57 +28,46 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * Check if we're returning from an OAuth callback
+ * Check if we're returning from an OAuth callback with tokens
+ * Returns { isOAuth: boolean, userId?: string, secret?: string }
  */
-function isOAuthCallback() {
+function getOAuthTokens() {
   const urlParams = new URLSearchParams(window.location.search);
 
-  // Check for our oauth=success marker (most reliable)
-  if (urlParams.has("oauth") && urlParams.get("oauth") === "success") {
-    return true;
+  // Check for OAuth token parameters (from createOAuth2Token)
+  const userId = urlParams.get("userId");
+  const secret = urlParams.get("secret");
+
+  if (userId && secret) {
+    return { isOAuth: true, userId, secret };
   }
 
-  // Check if referrer indicates OAuth flow
+  // Check if referrer indicates OAuth flow (fallback)
   const referrer = document.referrer;
-  const isFromAppwrite =
+  const isFromOAuth =
     referrer.includes("appwrite.io") ||
     referrer.includes("accounts.google.com");
 
-  // Also check URL for any other OAuth indicators
-  const hasAuthParams = urlParams.has("userId") || urlParams.has("secret");
-
-  return isFromAppwrite || hasAuthParams;
+  return { isOAuth: isFromOAuth, userId: null, secret: null };
 }
 
 /**
- * Get current user with retry for OAuth callbacks
- * OAuth redirects may need a moment for session to be ready
+ * Create session from OAuth tokens in URL
+ * This is the cookie-free approach that works on all browsers
  */
-async function getCurrentUserWithRetry(maxRetries = 5, delayMs = 800) {
-  const fromOAuth = isOAuthCallback();
+async function handleOAuthTokens(userId, secret) {
+  try {
+    console.log("🔐 Creating session from OAuth tokens...");
+    const { Account } = window.Appwrite;
+    const account = new Account(appwrite.getClient());
 
-  // If coming from OAuth, use longer delays
-  if (fromOAuth) {
-    console.log("Detected OAuth callback, using extended retry...");
-    maxRetries = 8;
-    delayMs = 1000;
+    const session = await account.createSession(userId, secret);
+    console.log("✅ Session created successfully:", session);
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to create session from tokens:", error);
+    return false;
   }
-
-  for (let i = 0; i < maxRetries; i++) {
-    console.log(`Auth check attempt ${i + 1}/${maxRetries}...`);
-    const user = await appwrite.getCurrentUser();
-    if (user) {
-      console.log("User found:", user.email);
-      return user;
-    }
-    // Wait before retrying (helps with OAuth callback timing)
-    if (i < maxRetries - 1) {
-      console.log(`Waiting ${delayMs}ms before retry...`);
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-  }
-  console.log("No user found after all retries");
-  return null;
 }
 
 /**
@@ -89,29 +78,32 @@ async function init() {
     // Initialize Appwrite client
     appwrite.initAppwrite();
 
-    // Check if this is an OAuth callback
-    const fromOAuth = isOAuthCallback();
-    if (fromOAuth) {
-      console.log("🔐 OAuth callback detected! Waiting for session...");
-      // Clean up the URL (remove oauth parameter)
-      const url = new URL(window.location.href);
-      url.searchParams.delete("oauth");
-      window.history.replaceState({}, document.title, url.pathname);
-    }
+    // Check if this is an OAuth callback with tokens
+    const oauthData = getOAuthTokens();
 
-    // Check if user is logged in (with retry for OAuth callback)
-    currentUser = await getCurrentUserWithRetry();
+    if (oauthData.isOAuth && oauthData.userId && oauthData.secret) {
+      console.log("🔐 OAuth tokens detected! Creating session...");
 
-    if (!currentUser) {
-      // If came from OAuth but no session, show helpful message
-      if (fromOAuth) {
-        console.log(
-          "⚠️ OAuth completed but session not found. This may be a cookie issue."
-        );
-        // Redirect with a message parameter
+      // Create session from tokens (works on ALL browsers!)
+      const success = await handleOAuthTokens(
+        oauthData.userId,
+        oauthData.secret
+      );
+
+      // Clean up the URL (remove tokens for security)
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      if (!success) {
+        console.error("❌ Failed to create session from OAuth tokens");
         window.location.href = "auth/login.html?error=oauth_session_failed";
         return;
       }
+    }
+
+    // Check if user is logged in
+    currentUser = await appwrite.getCurrentUser();
+
+    if (!currentUser) {
       // Redirect to login page if not logged in
       console.log("User not logged in, redirecting to login page...");
       window.location.href = "auth/login.html";

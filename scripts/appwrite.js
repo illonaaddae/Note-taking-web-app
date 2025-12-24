@@ -53,6 +53,14 @@ export async function initAppwrite() {
   console.log("Appwrite initialized successfully!");
 }
 
+/**
+ * Get the initialized Appwrite client
+ * @returns {Object} - The Appwrite client instance
+ */
+export function getClient() {
+  return client;
+}
+
 // ============================================
 // AUTHENTICATION
 // ============================================
