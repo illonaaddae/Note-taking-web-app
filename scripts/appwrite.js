@@ -154,6 +154,7 @@ export async function getAllNotes() {
       archived: doc.archived || false,
       createdAt: doc.$createdAt,
       updatedAt: doc.$updatedAt,
+      category: doc.category || "",
     }));
   } catch (error) {
     console.error("Error fetching notes:", error);
@@ -187,6 +188,7 @@ export async function createNote(note) {
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,
+        category: note.category || "",
       },
       [
         // Set document-level permissions - only this user can access this note
@@ -202,6 +204,7 @@ export async function createNote(note) {
       content: response.content,
       tags: response.tags,
       archived: response.archived,
+      category: response.category || "",
       createdAt: response.$createdAt,
       updatedAt: response.$updatedAt,
     };
@@ -228,6 +231,7 @@ export async function updateNote(noteId, updates) {
         ...(updates.content !== undefined && { content: updates.content }),
         ...(updates.tags !== undefined && { tags: updates.tags }),
         ...(updates.archived !== undefined && { archived: updates.archived }),
+        ...(updates.category !== undefined && { category: updates.category }),
       }
     );
 
@@ -237,6 +241,7 @@ export async function updateNote(noteId, updates) {
       content: response.content,
       tags: response.tags,
       archived: response.archived,
+      category: response.category || "",
       createdAt: response.$createdAt,
       updatedAt: response.$updatedAt,
     };
