@@ -207,6 +207,50 @@
   transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
+/* Sidebar Categories Styles */
+.sidebar-categories {
+  margin-top: var(--space-4);
+}
+.categories-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 var(--space-4);
+  margin-bottom: var(--space-2);
+}
+.categories-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--neutral-700);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 120%;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.category-item:hover {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+}
+.category-item.selected {
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+}
+
 .modal-overlay.active {
   opacity: 1;
   visibility: visible;
