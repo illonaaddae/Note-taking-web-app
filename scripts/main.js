@@ -142,6 +142,40 @@ async function init() {
  * Set up all event listeners
  */
 function setupEventListeners() {
+  // Rich Text Formatting Toolbar
+  setupRichTextToolbar();
+  /**
+   * Set up rich text formatting toolbar for note editor
+   */
+  function setupRichTextToolbar() {
+    const toolbar = document.getElementById("note-toolbar");
+    const editor = document.getElementById("note-content");
+    if (!toolbar || !editor) return;
+
+    // Formatting buttons
+    toolbar.querySelectorAll(".toolbar-btn").forEach((btn) => {
+      btn.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // Prevent losing focus
+        const command = btn.getAttribute("data-command");
+        if (command) {
+          document.execCommand(command, false, null);
+          editor.focus();
+        }
+      });
+    });
+
+    // Placeholder logic for contenteditable
+    function togglePlaceholder() {
+      if (editor.innerHTML === "" || editor.innerHTML === "<br>") {
+        editor.classList.add("empty");
+      } else {
+        editor.classList.remove("empty");
+      }
+    }
+    togglePlaceholder();
+    editor.addEventListener("input", togglePlaceholder);
+    editor.addEventListener("blur", togglePlaceholder);
+  }
   // Create new note button
   const createNoteBtn = document.getElementById("create-note-btn");
   const fabCreateNote = document.getElementById("fab-create-note");
