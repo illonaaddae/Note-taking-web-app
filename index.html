@@ -55,6 +55,13 @@
             <!-- Tags will be dynamically populated -->
           </ul>
         </div>
+        <!-- Categories Section -->
+        <div class="sidebar-categories">
+          <h3 class="categories-title">Categories</h3>
+          <ul class="categories-list" id="sidebar-categories">
+            <!-- Categories will be dynamically populated -->
+          </ul>
+        </div>
       </aside>
 
       <!-- ===== MOBILE HEADER ===== -->
@@ -219,6 +226,35 @@
                 </div>
                 <!-- Hidden input to maintain compatibility -->
                 <input type="hidden" id="note-tags" />
+              </div>
+              <div class="meta-item meta-item-category">
+                <img
+                  src="./assets/images/icon-folder.svg"
+                  alt=""
+                  class="meta-icon"
+                />
+                <span class="meta-label">Category</span>
+                <select id="note-category" aria-label="Note category">
+                  <option value="">Select category</option>
+                  <option value="Work">Work</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Ideas">Ideas</option>
+                  <option value="Archive">Archive</option>
+                  <option value="__new__">+ New Category</option>
+                </select>
+                <input
+                  type="text"
+                  id="new-category-input"
+                  placeholder="New category..."
+                  style="display: none"
+                />
+                <button
+                  type="button"
+                  id="add-category-btn"
+                  style="display: none"
+                >
+                  Add
+                </button>
               </div>
               <div class="meta-item meta-status hidden" id="note-status-row">
                 <img
