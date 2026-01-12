@@ -241,11 +241,156 @@
             </div>
 
             <!-- Note Content -->
+
+            <!-- Rich Text Formatting Toolbar -->
+            <div class="note-toolbar" id="note-toolbar">
+              <button
+                type="button"
+                class="toolbar-btn"
+                data-command="bold"
+                title="Bold (Ctrl+B)"
+              >
+                <b>B</b>
+              </button>
+              <button
+                type="button"
+                class="toolbar-btn"
+                data-command="italic"
+                title="Italic (Ctrl+I)"
+              >
+                <i>I</i>
+              </button>
+              <button
+                type="button"
+                class="toolbar-btn"
+                data-command="underline"
+                title="Underline (Ctrl+U)"
+              >
+                <u>U</u>
+              </button>
+              <span class="toolbar-separator"></span>
+              <button
+                type="button"
+                class="toolbar-btn"
+                data-command="insertUnorderedList"
+                title="Bullet List"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle cx="4" cy="5" r="1.5" fill="currentColor" />
+                  <circle cx="4" cy="9" r="1.5" fill="currentColor" />
+                  <circle cx="4" cy="13" r="1.5" fill="currentColor" />
+                  <rect
+                    x="7"
+                    y="4.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="7"
+                    y="8.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="7"
+                    y="12.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="toolbar-btn"
+                data-command="insertOrderedList"
+                title="Numbered List"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <text
+                    x="2.5"
+                    y="6.5"
+                    font-size="3.5"
+                    font-family="sans-serif"
+                    fill="currentColor"
+                  >
+                    1.
+                  </text>
+                  <text
+                    x="2.5"
+                    y="10.5"
+                    font-size="3.5"
+                    font-family="sans-serif"
+                    fill="currentColor"
+                  >
+                    2.
+                  </text>
+                  <text
+                    x="2.5"
+                    y="14.5"
+                    font-size="3.5"
+                    font-family="sans-serif"
+                    fill="currentColor"
+                  >
+                    3.
+                  </text>
+                  <rect
+                    x="7"
+                    y="4.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="7"
+                    y="8.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="7"
+                    y="12.25"
+                    width="7"
+                    height="1.5"
+                    rx="0.75"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
             <div class="note-content">
-              <textarea
+              <div
                 id="note-content"
-                placeholder="Start writing your note..."
-              ></textarea>
+                class="rich-text-area"
+                contenteditable="true"
+                aria-label="Start writing your note..."
+                spellcheck="true"
+                data-placeholder="Start writing your note..."
+              ></div>
             </div>
 
             <!-- Note Actions -->
