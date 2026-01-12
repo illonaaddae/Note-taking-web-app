@@ -142,6 +142,48 @@ async function init() {
  * Set up all event listeners
  */
 function setupEventListeners() {
+  // Share note button
+  const shareNoteBtn = document.getElementById("share-note-btn");
+  shareNoteBtn?.addEventListener("click", handleShareNote);
+}
+
+/**
+ * Handle share note: generate shareable link and copy to clipboard
+ */
+function handleShareNote() {
+  const noteId = ui.getCurrentNoteId();
+  if (!noteId) {
+    ui.showToast("No note selected to share.", "error");
+    return;
+  }
+  // Generate shareable link (assume shared.html?note=ID)
+  const shareUrl = `${
+    window.location.origin
+  }/shared.html?note=${encodeURIComponent(noteId)}`;
+  // Copy to clipboard
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareUrl).then(
+      () => {
+        ui.showToast("Shareable link copied to clipboard!", "success");
+      },
+      () => {
+        ui.showToast("Failed to copy link.", "error");
+      }
+    );
+  } else {
+    // Fallback for older browsers
+    const tempInput = document.createElement("input");
+    tempInput.value = shareUrl;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    try {
+      document.execCommand("copy");
+      ui.showToast("Shareable link copied to clipboard!", "success");
+    } catch {
+      ui.showToast("Failed to copy link.", "error");
+    }
+    document.body.removeChild(tempInput);
+  }
   // Rich Text Formatting Toolbar
   setupRichTextToolbar();
   // End of setupEventListeners
@@ -588,7 +630,7 @@ async function handleSaveNote() {
   }
 
   const title = document.getElementById("note-title")?.textContent || "";
-  const content = document.getElementById("note-content")?.value || "";
+  const content = document.getElementById("note-content")?.innerHTML || "";
   const tagsText = document.getElementById("note-tags")?.value || "";
   const tags = tagsText
     .split(",")
