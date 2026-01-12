@@ -2,7 +2,8 @@
  * Main App Entry Point
  * Initializes all modules and sets up the notes app with Appwrite backend
  */
-
+import { setupExportButton, setupImportButton } from "./ui.js";
+import { getDocument } from "./utils.js";
 import * as appwrite from "./appwrite.js";
 import * as noteManager from "./noteManager.js";
 import * as ui from "./ui.js";
@@ -143,34 +144,34 @@ async function init() {
  */
 function setupEventListeners() {
   // Create new note button
-  const createNoteBtn = document.getElementById("create-note-btn");
-  const fabCreateNote = document.getElementById("fab-create-note");
+  const createNoteBtn = getDocument("create-note-btn", "id");
+  const fabCreateNote = getDocument("fab-create-note", "id");
 
   createNoteBtn?.addEventListener("click", handleCreateNote);
   fabCreateNote?.addEventListener("click", handleCreateNote);
 
   // Save note button
-  const saveNoteBtn = document.getElementById("save-note-btn");
+  const saveNoteBtn = getDocument("save-note-btn", "id");
   saveNoteBtn?.addEventListener("click", handleSaveNote);
 
   // Cancel button
-  const cancelBtn = document.getElementById("cancel-btn");
+  const cancelBtn = getDocument("cancel-btn", "id");
   cancelBtn?.addEventListener("click", handleCancel);
 
   // Archive note button
-  const archiveNoteBtn = document.getElementById("archive-note-btn");
+  const archiveNoteBtn = getDocument("archive-note-btn", "id");
   archiveNoteBtn?.addEventListener("click", handleArchiveNote);
 
   // Delete note button
-  const deleteNoteBtn = document.getElementById("delete-note-btn");
+  const deleteNoteBtn = getDocument("delete-note-btn", "id");
   deleteNoteBtn?.addEventListener("click", handleDeleteNote);
 
   // Mobile buttons
-  const mobileBackBtn = document.getElementById("mobile-back-btn");
-  const mobileSaveBtn = document.getElementById("mobile-save-btn");
-  const mobileCancelBtn = document.getElementById("mobile-cancel-btn");
-  const mobileArchiveBtn = document.getElementById("mobile-archive-btn");
-  const mobileDeleteBtn = document.getElementById("mobile-delete-btn");
+  const mobileBackBtn = getDocument("mobile-back-btn", "id");
+  const mobileSaveBtn = getDocument("mobile-save-btn", "id");
+  const mobileCancelBtn = getDocument("mobile-cancel-btn", "id");
+  const mobileArchiveBtn = getDocument("mobile-archive-btn", "id");
+  const mobileDeleteBtn = getDocument("mobile-delete-btn", "id");
 
   mobileBackBtn?.addEventListener("click", handleMobileBack);
   mobileSaveBtn?.addEventListener("click", handleSaveNote);
@@ -179,27 +180,27 @@ function setupEventListeners() {
   mobileDeleteBtn?.addEventListener("click", handleDeleteNote);
 
   // Search input (desktop)
-  const searchInput = document.getElementById("search-input");
+  const searchInput = getDocument("search-input", "id");
   searchInput?.addEventListener("input", handleSearch);
 
   // Mobile search input
-  const mobileSearchInput = document.getElementById("mobile-search-input");
+  const mobileSearchInput = getDocument("mobile-search-input", "id");
   mobileSearchInput?.addEventListener("input", handleMobileSearch);
 
   // Mobile search results click handler
-  const mobileSearchResults = document.getElementById("mobile-search-results");
+  const mobileSearchResults = getDocument("mobile-search-results", "id");
   mobileSearchResults?.addEventListener("click", handleNoteClick);
 
   // Mobile tags list click handler
-  const mobileTagsList = document.getElementById("mobile-tags-list");
+  const mobileTagsList = getDocument("mobile-tags-list", "id");
   mobileTagsList?.addEventListener("click", handleMobileTagClick);
 
   // Notes list - event delegation
-  const notesList = document.getElementById("notes-list");
+  const notesList = getDocument("notes-list", "id");
   notesList?.addEventListener("click", handleNoteClick);
 
   // Sidebar tags - event delegation
-  const sidebarTags = document.getElementById("sidebar-tags");
+  const sidebarTags = getDocument("sidebar-tags", "id");
   sidebarTags?.addEventListener("click", handleTagClick);
 
   // Navigation items
@@ -208,15 +209,15 @@ function setupEventListeners() {
   });
 
   // Settings button
-  const settingsBtn = document.getElementById("settings-btn");
+  const settingsBtn = getDocument("settings-btn", "id");
   settingsBtn?.addEventListener("click", () => {
     window.location.href = "settings.html";
   });
 
   // Modal event listeners
-  const modalOverlay = document.getElementById("modal-overlay");
-  const modalCancel = document.getElementById("modal-cancel");
-  const modalConfirm = document.getElementById("modal-confirm");
+  const modalOverlay = getDocument("modal-overlay", "id");
+  const modalCancel = getDocument("modal-cancel", "id");
+  const modalConfirm = getDocument("modal-confirm", "id");
 
   modalOverlay?.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal();
@@ -228,9 +229,9 @@ function setupEventListeners() {
   document.addEventListener("keydown", handleKeyboardNav);
 
   // Auto-save draft on input (sessionStorage)
-  const noteTitle = document.getElementById("note-title");
-  const noteContent = document.getElementById("note-content");
-  const noteTags = document.getElementById("note-tags");
+  const noteTitle = getDocument("note-title", "id");
+  const noteContent = getDocument("note-content", "id");
+  const noteTags = getDocument("note-tags", "id");
 
   noteTitle?.addEventListener("input", handleDraftAutoSave);
   noteContent?.addEventListener("input", handleDraftAutoSave);
@@ -238,16 +239,22 @@ function setupEventListeners() {
 
   // Tags selector event listeners
   setupTagsSelector();
+
+  //initialize the Export function
+  setupExportButton();
+
+  //initialize the Import function
+  setupImportButton();
 }
 
 /**
  * Set up tags selector (Mac Notes style checkboxes)
  */
 function setupTagsSelector() {
-  const tagsSelected = document.getElementById("tags-selected");
-  const tagsDropdown = document.getElementById("tags-dropdown");
-  const tagsSearchInput = document.getElementById("tags-search-input");
-  const btnAddTag = document.getElementById("btn-add-tag");
+  const tagsSelected = getDocument("tags-selected", "id");
+  const tagsDropdown = getDocument("tags-dropdown", "id");
+  const tagsSearchInput = getDocument("tags-search-input", "id");
+  const btnAddTag = getDocument("btn-add-tag", "id");
 
   if (!tagsSelected || !tagsDropdown) return;
 
@@ -259,7 +266,7 @@ function setupTagsSelector() {
 
   // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
-    const tagsSelector = document.getElementById("tags-selector");
+    const tagsSelector = getDocument("tags-selector", "id");
     if (tagsSelector && !tagsSelector.contains(e.target)) {
       closeTagsDropdown();
     }
@@ -292,7 +299,7 @@ function setupTagsSelector() {
   });
 
   // Tag dropdown item click (delegation)
-  const tagsDropdownList = document.getElementById("tags-dropdown-list");
+  const tagsDropdownList = getDocument("tags-dropdown-list", "id");
   tagsDropdownList?.addEventListener("click", (e) => {
     const item = e.target.closest(".tags-dropdown-item");
     if (item) {
@@ -314,7 +321,7 @@ function setupTagsSelector() {
  * Toggle tags dropdown visibility
  */
 function toggleTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
+  const tagsDropdown = getDocument("tags-dropdown", "id");
   const isHidden = tagsDropdown?.classList.contains("hidden");
 
   if (isHidden) {
@@ -328,8 +335,8 @@ function toggleTagsDropdown() {
  * Open tags dropdown
  */
 function openTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
-  const tagsSearchInput = document.getElementById("tags-search-input");
+  const tagsDropdown = getDocument("tags-dropdown", "id");
+  const tagsSearchInput = getDocument("tags-search-input", "id");
 
   tagsDropdown?.classList.remove("hidden");
   renderTagsDropdown();
@@ -340,7 +347,7 @@ function openTagsDropdown() {
  * Close tags dropdown
  */
 function closeTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
+  const tagsDropdown = getDocument("tags-dropdown", "id");
   tagsDropdown?.classList.add("hidden");
 }
 
@@ -348,7 +355,7 @@ function closeTagsDropdown() {
  * Render tags dropdown with checkboxes
  */
 function renderTagsDropdown(filterQuery = "") {
-  const tagsDropdownList = document.getElementById("tags-dropdown-list");
+  const tagsDropdownList = getDocument("tags-dropdown-list", "id");
   if (!tagsDropdownList) return;
 
   // Get all unique tags from notes cache
@@ -404,7 +411,7 @@ function filterTagsDropdown(query) {
   renderTagsDropdown(query);
 
   // Update "Create new tag" button text
-  const btnAddTag = document.getElementById("btn-add-tag");
+  const btnAddTag = getDocument("btn-add-tag", "id");
   if (btnAddTag) {
     const span = btnAddTag.querySelector("span");
     if (span) {
@@ -417,7 +424,7 @@ function filterTagsDropdown(query) {
  * Get currently selected tags from UI
  */
 function getSelectedTags() {
-  const hiddenInput = document.getElementById("note-tags");
+  const hiddenInput = getDocument("note-tags", "id");
   const value = hiddenInput?.value || "";
   return value
     .split(",")
@@ -429,8 +436,8 @@ function getSelectedTags() {
  * Set selected tags in UI
  */
 function setSelectedTags(tags) {
-  const hiddenInput = document.getElementById("note-tags");
-  const tagsSelected = document.getElementById("tags-selected");
+  const hiddenInput = getDocument("note-tags", "id");
+  const tagsSelected = getDocument("tags-selected", "id");
 
   if (hiddenInput) {
     hiddenInput.value = tags.join(", ");
@@ -567,9 +574,9 @@ async function handleSaveNote() {
     return;
   }
 
-  const title = document.getElementById("note-title")?.textContent || "";
-  const content = document.getElementById("note-content")?.value || "";
-  const tagsText = document.getElementById("note-tags")?.value || "";
+  const title = getDocument("note-title", "id")?.textContent || "";
+  const content = getDocument("note-content", "id")?.value || "";
+  const tagsText = getDocument("note-tags", "id")?.value || "";
   const tags = tagsText
     .split(",")
     .map((t) => t.trim())

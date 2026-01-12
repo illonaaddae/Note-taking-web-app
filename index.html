@@ -259,13 +259,27 @@
 
           <!-- Note Actions Sidebar (Desktop) -->
           <aside class="note-actions-sidebar" id="note-actions-sidebar">
-            <button class="btn btn-action" id="archive-note-btn">
+            <button type="button" class="btn btn-action" id="archive-note-btn">
               <img src="./assets/images/icon-archive.svg" alt="" />
               <span>Archive Note</span>
             </button>
-            <button class="btn btn-action" id="delete-note-btn">
+            <button type="button" class="btn btn-action" id="delete-note-btn">
               <img src="./assets/images/icon-delete.svg" alt="" />
               <span>Delete Note</span>
+            </button>
+            <button type="button" class="btn btn-action" id="export-notes-btn">
+              <img src="./assets/images/icon-export.svg" alt="" />
+              <span>Export Notes</span>
+            </button>
+            <button type="button" class="btn btn-action" id="import-notes-btn">
+              <img src="./assets/images/icon-import.svg" alt="" />
+              <input
+                type="file"
+                id="import-notes-input"
+                accept=".json"
+                style="display: none"
+              />
+              <span>Import Notes</span>
             </button>
           </aside>
         </div>
