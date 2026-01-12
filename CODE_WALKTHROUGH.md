@@ -179,7 +179,7 @@ export function createNote(title, content, tags = []) {
   const now = new Date().toISOString(); // ISO format: "2024-12-23T10:30:00.000Z"
   return {
     id: generateId(),
-    title: title || "Untitled Note",
+    title: title || "",
     content: content || "",
     tags: tags, // Array of strings
     archived: false,
@@ -348,6 +348,13 @@ export async function getAllNotes() {
   try {
     const { Query } = window.Appwrite;
 
+    // Get current user for permission filtering
+    const user = await getCurrentUser();
+    if (!user) {
+      console.error("No user logged in, cannot fetch notes");
+      return [];
+    }
+
     const response = await databases.listDocuments(
       CONFIG.databaseId,
       CONFIG.collectionId,
@@ -357,8 +364,17 @@ export async function getAllNotes() {
       ]
     );
 
+    // IMPORTANT: Filter notes to only show those belonging to current user
+    // Check the $permissions array for user-specific read permission
+    const userPermission = `read("user:${user.$id}")`;
+    const userNotes = response.documents.filter((doc) => {
+      return doc.$permissions && doc.$permissions.includes(userPermission);
+    });
+
+    console.log(`📝 Found ${userNotes.length} notes for user ${user.email}`);
+
     // Transform Appwrite document format to our note format
-    return response.documents.map((doc) => ({
+    return userNotes.map((doc) => ({
       id: doc.$id, // Appwrite uses $id
       title: doc.title,
       content: doc.content || "", // Default to empty string
@@ -389,7 +405,9 @@ export async function createNote(note) {
       CONFIG.collectionId,
       ID.unique(), // Generate unique document ID
       {
-        title: note.title || "Untitled Note",
+        // Use space character as placeholder for empty title (title is required in schema)
+        // UI will show "Enter a title..." placeholder via CSS when title is whitespace-only
+        title: note.title?.trim() || " ",
         content: note.content || "",
         tags: note.tags || [],
         archived: note.archived || false,
@@ -526,10 +544,17 @@ function renderNoteCard(note) {
     .map((tag) => `<span class="tag-badge">${tag}</span>`)
     .join(""); // Join array elements into single string
 
+  // Handle empty title with special CSS class for placeholder styling
+  const trimmedTitle = note.title?.trim() || "";
+  const displayTitle = trimmedTitle || "Untitled";
+  const titleClass = trimmedTitle
+    ? "note-card-title"
+    : "note-card-title note-card-title--empty"; // CSS class for empty state
+
   // Return HTML template using template literals
   return `
     <div class="note-card" data-note-id="${note.id}">
-      <h3 class="note-card-title">${note.title || "Untitled Note"}</h3>
+      <h3 class="${titleClass}">${displayTitle}</h3>
       <div class="note-card-tags">${tagsHtml}</div>
       <span class="note-card-date">${formatDate(note.updatedAt)}</span>
     </div>
