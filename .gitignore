@@ -37,4 +37,8 @@ npm-debug.log*
 *.log
 *.pem
 .DS_Store
-Thumbs.dbDEFENSE_GUIDE.md
+Thumbs.db
+
+# Personal documentation
+DEFENSE_GUIDE.md
+CODE_WALKTHROUGH.md
