@@ -41,6 +41,12 @@ function renderNoteCard(note) {
     .map((tag) => `<span class="tag-badge">${tag}</span>`)
     .join("");
 
+  // Category badge
+  const categoryHtml =
+    note.category && note.category.trim()
+      ? `<span class="category-badge">${note.category}</span>`
+      : "";
+
   // Show "Untitled" with different styling if no title (or whitespace-only)
   const trimmedTitle = note.title?.trim() || "";
   const displayTitle = trimmedTitle || "Untitled";
@@ -51,6 +57,7 @@ function renderNoteCard(note) {
   return `
     <div class="note-card" data-note-id="${note.id}">
       <h3 class="${titleClass}">${displayTitle}</h3>
+      ${categoryHtml}
       <div class="note-card-tags">${tagsHtml}</div>
       <span class="note-card-date">${formatDate(note.updatedAt)}</span>
     </div>
@@ -341,4 +348,114 @@ export function updateArchiveButton(isArchived) {
     if (img) img.src = "./assets/images/icon-archive.svg";
     if (span) span.textContent = "Archive Note";
   }
+}
+
+// Helper to get all unique categories from notes
+export function getAllCategories(notes) {
+  const categories = new Set();
+  notes.forEach((note) => {
+    if (note.category && note.category.trim() !== "") {
+      categories.add(note.category.trim());
+    }
+  });
+  return Array.from(categories);
+}
+
+// Call this when rendering the note editor
+export function renderCategorySelector(notes, selectedCategory = "") {
+  console.log(
+    "renderCategorySelector called with",
+    notes.length,
+    "notes, selectedCategory:",
+    selectedCategory
+  );
+
+  const categorySelect = getDocument("note-category", "id");
+  const newCategoryInput = getDocument("new-category-input", "id");
+  const addCategoryBtn = getDocument("add-category-btn", "id");
+
+  if (!categorySelect || !addCategoryBtn || !newCategoryInput) {
+    return;
+  }
+
+  // Get categories from notes + default preset categories
+  const defaultCategories = ["Work", "Personal", "Ideas", "Archive"];
+  const notesCategories = getAllCategories(notes);
+  const allCategories = [
+    ...new Set([...defaultCategories, ...notesCategories]),
+  ];
+
+  // Populate dropdown
+  categorySelect.innerHTML =
+    `<option value="">Select category</option>` +
+    allCategories
+      .map((cat) => `<option value="${cat}">${cat}</option>`)
+      .join("") +
+    `<option value="__new__">+ New Category</option>`;
+
+  // Set selected value
+  categorySelect.value = selectedCategory || "";
+
+  // Show input if "New Category" is selected
+  categorySelect.addEventListener("change", () => {
+    if (categorySelect.value === "__new__") {
+      newCategoryInput.style.display = "inline-block";
+    } else {
+      newCategoryInput.style.display = "none";
+    }
+  });
+
+  // Add new category to dropdown
+  addCategoryBtn.addEventListener("click", () => {
+    const newCat = newCategoryInput.value.trim();
+    if (newCat && !categories.includes(newCat)) {
+      const option = document.createElement("option");
+      option.value = newCat;
+      option.textContent = newCat;
+      categorySelect.insertBefore(option, categorySelect.lastElementChild);
+      categorySelect.value = newCat;
+      newCategoryInput.value = "";
+      newCategoryInput.style.display = "none";
+    }
+  });
+}
+
+// Render sidebar category list and handle filtering
+export function renderSidebarCategories(notes, selectedCategory = "") {
+  const sidebar = document.getElementById("sidebar-categories");
+  if (!sidebar) return;
+
+  // Get categories from notes + default preset categories
+  const defaultCategories = ["Work", "Personal", "Ideas", "Archive"];
+  const notesCategories = getAllCategories(notes);
+  const categories = [...new Set([...defaultCategories, ...notesCategories])];
+
+  sidebar.innerHTML =
+    `<li class="category-item${
+      selectedCategory === "" ? " selected" : ""
+    }" data-category="">All</li>` +
+    categories
+      .map(
+        (cat) =>
+          `<li class="category-item${
+            cat === selectedCategory ? " selected" : ""
+          }" data-category="${cat}">${cat}</li>`
+      )
+      .join("");
+
+  Array.from(sidebar.querySelectorAll(".category-item")).forEach((item) => {
+    item.addEventListener("click", () => {
+      const cat = item.getAttribute("data-category");
+      // Custom event for filtering
+      const event = new CustomEvent("categoryFilter", {
+        detail: { category: cat },
+      });
+      sidebar.dispatchEvent(event);
+      // Highlight selected
+      Array.from(sidebar.querySelectorAll(".category-item")).forEach((i) =>
+        i.classList.remove("selected")
+      );
+      item.classList.add("selected");
+    });
+  });
 }

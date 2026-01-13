@@ -122,6 +122,9 @@ async function init() {
     // Update tags in sidebar
     ui.updateTagList(noteManager.getAllTags(notesCache));
 
+    // Render categories in sidebar
+    ui.renderSidebarCategories(notesCache);
+
     // Set up event listeners
     setupEventListeners();
 
@@ -202,6 +205,20 @@ function setupEventListeners() {
   const sidebarTags = document.getElementById("sidebar-tags");
   sidebarTags?.addEventListener("click", handleTagClick);
 
+  // Sidebar category filtering
+  const sidebarCategories = document.getElementById("sidebar-categories");
+  if (sidebarCategories) {
+    sidebarCategories.addEventListener("categoryFilter", (e) => {
+      const cat = e.detail.category || "";
+      // Filter notes by category (and not archived)
+      const filtered =
+        cat === ""
+          ? notesCache.filter((n) => !n.archived)
+          : notesCache.filter((n) => n.category === cat && !n.archived);
+      ui.renderAllNotes(filtered);
+    });
+  }
+
   // Navigation items
   document.querySelectorAll("[data-page]").forEach((item) => {
     item.addEventListener("click", handleNavClick);
@@ -238,6 +255,64 @@ function setupEventListeners() {
 
   // Tags selector event listeners
   setupTagsSelector();
+
+  // Category selector event listeners
+  setupCategorySelector();
+}
+
+/**
+ * Set up category selector (new category input toggle)
+ */
+function setupCategorySelector() {
+  const categorySelect = document.getElementById("note-category");
+  const newCategoryInput = document.getElementById("new-category-input");
+  const addCategoryBtn = document.getElementById("add-category-btn");
+
+  if (!categorySelect || !newCategoryInput || !addCategoryBtn) {
+    return;
+  }
+
+  // Show/hide input and button when "+ New Category" is selected
+  categorySelect.onchange = function () {
+    if (categorySelect.value === "__new__") {
+      newCategoryInput.style.display = "inline-block";
+      addCategoryBtn.style.display = "inline-block";
+      newCategoryInput.focus();
+    } else {
+      newCategoryInput.style.display = "none";
+      addCategoryBtn.style.display = "none";
+    }
+  };
+
+  // Add new category when clicking "Add" button
+  addCategoryBtn.onclick = function () {
+    const newCat = newCategoryInput.value.trim();
+    if (newCat) {
+      // Check if category already exists
+      const existingOptions = Array.from(categorySelect.options).map(
+        (o) => o.value
+      );
+      if (!existingOptions.includes(newCat)) {
+        const option = document.createElement("option");
+        option.value = newCat;
+        option.textContent = newCat;
+        // Insert before the last option (+ New Category)
+        categorySelect.insertBefore(option, categorySelect.lastElementChild);
+      }
+      categorySelect.value = newCat;
+      newCategoryInput.value = "";
+      newCategoryInput.style.display = "none";
+      addCategoryBtn.style.display = "none";
+    }
+  };
+
+  // Allow pressing Enter in the input to add category
+  newCategoryInput.onkeydown = function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addCategoryBtn.click();
+    }
+  };
 }
 
 /**
@@ -542,6 +617,7 @@ async function handleCreateNote() {
     ui.renderAllNotes(notesCache.filter((n) => !n.archived));
     ui.showNoteDetail(newNote);
     ui.setActiveNote(newNote.id);
+    ui.renderCategorySelector(notesCache, "");
 
     // On mobile, show the note detail section as overlay
     const noteDetailSection = document.getElementById("note-detail");
@@ -560,29 +636,50 @@ async function handleCreateNote() {
  */
 async function handleSaveNote() {
   const noteId = ui.getCurrentNoteId();
-  console.log("Saving note with ID:", noteId);
-
-  if (!noteId) {
-    console.log("No note ID found, cannot save");
-    return;
-  }
 
   const title = document.getElementById("note-title")?.textContent || "";
   const content = document.getElementById("note-content")?.value || "";
   const tagsText = document.getElementById("note-tags")?.value || "";
+  const category = document.getElementById("note-category")?.value || "";
   const tags = tagsText
     .split(",")
     .map((t) => t.trim())
     .filter((t) => t);
 
-  console.log("Saving with data:", { title, content, tags });
-
   try {
-    // Update note in Appwrite
+    // If no note ID, create a new note first
+    if (!noteId) {
+      const newNote = await appwrite.createNote({
+        title,
+        content,
+        tags,
+        category,
+        archived: false,
+      });
+
+      // Add to local cache
+      notesCache.unshift(newNote);
+
+      // Update UI
+      ui.renderAllNotes(notesCache.filter((n) => !n.archived));
+      ui.updateTagList(noteManager.getAllTags(notesCache));
+      ui.renderSidebarCategories(notesCache);
+      ui.showNoteDetail(newNote);
+      ui.setActiveNote(newNote.id);
+
+      // Clear draft after successful save
+      clearDraft();
+
+      ui.showToast("Note created successfully!");
+      return;
+    }
+
+    // Update existing note in Appwrite
     const updatedNote = await appwrite.updateNote(noteId, {
       title,
       content,
       tags,
+      category,
     });
 
     console.log("Note saved successfully:", updatedNote);
@@ -596,6 +693,7 @@ async function handleSaveNote() {
     // Update UI
     ui.renderAllNotes(notesCache.filter((n) => !n.archived));
     ui.updateTagList(noteManager.getAllTags(notesCache));
+    ui.renderSidebarCategories(notesCache);
 
     // Clear draft after successful save
     clearDraft();
@@ -617,6 +715,7 @@ function handleCancel() {
   const note = notesCache.find((n) => n.id === noteId);
   if (note) {
     ui.showNoteDetail(note);
+    ui.renderCategorySelector(notesCache, note.category || "");
   }
 
   // On mobile, also go back to the list
@@ -955,6 +1054,7 @@ function handleNoteClick(e) {
     ui.showNoteDetail(note);
     ui.setActiveNote(noteId);
     ui.updateArchiveButton(note.archived);
+    ui.renderCategorySelector(notesCache, note.category || "");
 
     // On mobile, show the note detail section as overlay
     const noteDetailSection = document.getElementById("note-detail");

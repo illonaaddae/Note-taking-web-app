@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shared Note</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/dashboard.css" />
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/themes.css" />
+  </head>
+  <body>
+    <main class="shared-note-container">
+      <div id="shared-note" class="shared-note-card">
+        <p>Loading note...</p>
+      </div>
+    </main>
+    <script type="module">
+      import { getDocument } from "./scripts/utils.js";
+      import { getNoteById } from "./scripts/appwrite.js";
+
+      async function loadSharedNote() {
+        const params = new URLSearchParams(window.location.search);
+        const noteId = params.get("id");
+        const noteContainer = getDocument("shared-note", "id");
+        if (!noteId) {
+          noteContainer.innerHTML = "<p>Invalid note link.</p>";
+          return;
+        }
+        try {
+          const note = await getNoteById(noteId);
+          if (!note) {
+            noteContainer.innerHTML = "<p>Note not found or not shared.</p>";
+            return;
+          }
+          noteContainer.innerHTML = `
+          <h2 class="shared-note-title">${note.title || "Untitled"}</h2>
+          <div class="shared-note-content">${note.content}</div>
+          <div class="shared-note-tags">
+            ${note.tags
+              .map((tag) => `<span class='tag-badge'>${tag}</span>`)
+              .join("")}
+          </div>
+          <div class="shared-note-date">Last updated: ${note.updatedAt}</div>
+        `;
+        } catch (err) {
+          noteContainer.innerHTML = "<p>Error loading note.</p>";
+        }
+      }
+      loadSharedNote();
+    </script>
+  </body>
+</html>
