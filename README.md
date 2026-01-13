@@ -1,63 +1,80 @@
-# 📝 Note-Taking Web App
+# Note-Taking Web App
 
-A modern, full-featured note-taking application built with **vanilla JavaScript (ES6 Modules)** and **Appwrite Cloud** backend. This project demonstrates advanced DOM manipulation, event handling, browser storage APIs, and cloud database integration.
+This is a modern, full-featured note-taking application built with vanilla JavaScript (ES6 Modules) and Appwrite Cloud backend. It demonstrates modular architecture, advanced DOM manipulation, event handling, browser storage APIs, and cloud database integration.
 
-![Note Taking App](./assets/images/logo.svg)
+## Features
 
----
+- Create, read, update, and delete notes
+- Archive and unarchive notes
+- Organize notes with tags and filter by tag
+- Real-time search by title, content, and tags
+- Theme switching (light, dark, system)
+- Font customization (sans-serif, serif, monospace)
+- Cloud database with Appwrite backend
+- User authentication (email/password, Google OAuth)
+- Password recovery and auto-save drafts
+- Responsive design for mobile, tablet, and desktop
 
-## 📋 Table of Contents
+## Tech Stack
 
-1. [Features](#-features)
-2. [Tech Stack](#-tech-stack)
-3. [Project Architecture](#-project-architecture)
-4. [File Structure](#-file-structure)
-5. [Appwrite Integration](#-appwrite-integration)
-6. [Module Breakdown](#-module-breakdown)
-7. [Data Flow](#-data-flow)
-8. [Event Handling](#-event-handling)
-9. [Authentication Flow](#-authentication-flow)
-10. [Storage Strategy](#-storage-strategy)
-11. [Theming System](#-theming-system)
-12. [Responsive Design](#-responsive-design)
-13. [Setup & Installation](#-setup--installation)
-14. [Lab Requirements Coverage](#-lab-requirements-coverage)
+| Layer          | Technology                            |
+| -------------- | ------------------------------------- |
+| Frontend       | HTML5, CSS3, Vanilla JavaScript (ES6) |
+| Backend        | Appwrite Cloud (BaaS)                 |
+| Database       | Appwrite Database                     |
+| Authentication | Appwrite Auth + Google OAuth          |
+| Styling        | CSS Custom Properties (Design Tokens) |
+| Architecture   | ES6 Modules (no build tools)          |
 
----
+## Project Architecture
 
-## ✨ Features
+The app uses a modular ES6 structure with clear separation of concerns:
 
-### Core Features
+- Entry: main.js
+- Appwrite SDK wrapper: appwrite.js
+- Note logic: noteManager.js
+- UI rendering: ui.js
+- Storage: storage.js
+- Utilities: utils.js
+- Auth modules: auth/
 
-- ✅ **CRUD Operations** - Create, Read, Update, Delete notes
-- ✅ **Archive System** - Archive/unarchive notes
-- ✅ **Tag System** - Organize notes with tags, filter by tag
-- ✅ **Search** - Real-time search by title, content, and tags
-- ✅ **Theme Switching** - Light, Dark, and System-auto themes
-- ✅ **Font Customization** - Sans-serif, Serif, Monospace fonts
+## File Structure
 
-### Advanced Features
+```
+note-taking-web-app/
+├── index.html
+├── settings.html
+├── data.json
+├── auth/
+├── scripts/
+├── styles/
+└── assets/
+```
 
-- ✅ **Cloud Database** - Appwrite backend (data persists across devices)
-- ✅ **User Authentication** - Sign up, Login, Logout
-- ✅ **Google OAuth** - One-click Google sign-in
-- ✅ **Password Recovery** - Forgot password & reset flow
-- ✅ **Auto-save Drafts** - sessionStorage for unsaved work
-- ✅ **Keyboard Navigation** - Full keyboard accessibility
-- ✅ **Responsive Design** - Mobile, Tablet, Desktop layouts
+## Appwrite Integration
 
----
+The app uses Appwrite for database, authentication, and cloud storage. All CRUD operations and user management are handled via the Appwrite SDK.
 
-## 🛠 Tech Stack
+## Setup & Installation
 
-| Layer              | Technology                            |
-| ------------------ | ------------------------------------- |
-| **Frontend**       | HTML5, CSS3, Vanilla JavaScript (ES6) |
-| **Backend**        | Appwrite Cloud (BaaS)                 |
-| **Database**       | Appwrite Database                     |
-| **Authentication** | Appwrite Auth + Google OAuth          |
-| **Styling**        | CSS Custom Properties (Design Tokens) |
-| **Architecture**   | ES6 Modules (no build tools)          |
+1. Clone the repository:
+
+```bash
+git clone https://github.com/illonaaddae/Note-taking-web-app.git
+cd Note-taking-web-app
+```
+
+2. Open in VS Code or your preferred editor.
+3. Start a static server (e.g., Live Server extension) and open index.html.
+4. The app is pre-configured to connect to the Appwrite cloud instance.
+
+## Author
+
+Illona Addae
+
+## License
+
+This project is for educational purposes as part of the AmaliTech training program.
 
 ---
 
@@ -122,23 +139,23 @@ note-taking-web-app/
 │   └── reset-password.html # Reset password page
 │
 ├── scripts/                # JavaScript modules
-│   ├── main.js             # 🎯 App entry point, event handlers
-│   ├── appwrite.js         # 🌐 Appwrite database operations
-│   ├── noteManager.js      # 📝 Note data manipulation (pure functions)
-│   ├── ui.js               # 🖼️ DOM rendering functions
-│   ├── theme.js            # 🎨 Theme & font switching
-│   ├── storage.js          # 💾 localStorage & sessionStorage
-│   ├── settings.js         # ⚙️ Settings page logic
-│   ├── utils.js            # 🔧 Helper utilities
+│   ├── main.js             # App entry point, event handlers
+│   ├── appwrite.js         # Appwrite database operations
+│   ├── noteManager.js      # Note data manipulation (pure functions)
+│   ├── ui.js               # DOM rendering functions
+│   ├── theme.js            # Theme & font switching
+│   ├── storage.js          # localStorage & sessionStorage
+│   ├── settings.js         # Settings page logic
+│   ├── utils.js            # Helper utilities
 │   └── auth/               # Auth-specific modules
 │       ├── index.js        # Auth pages entry point
-│       ├── authService.js  # 🔐 Appwrite authentication
+│       ├── authService.js  # Appwrite authentication
 │       ├── formHandlers.js # Form submission handlers
 │       ├── validation.js   # Form validation logic
 │       └── passwordToggle.js # Password visibility toggle
 │
 ├── styles/                 # CSS stylesheets
-│   ├── tokens.css          # 🎨 Design tokens (colors, spacing, etc.)
+│   ├── tokens.css          # Design tokens (colors, spacing, etc.)
 │   ├── base.css            # Base/reset styles
 │   ├── components.css      # Reusable component styles
 │   ├── dashboard.css       # Dashboard-specific styles
@@ -292,7 +309,7 @@ export async function deleteNote(noteId) {
 
 ---
 
-## 📦 Module Breakdown
+## Module Breakdown
 
 ### 1. `main.js` - Application Entry Point
 
@@ -524,7 +541,7 @@ export async function resetPassword(userId, secret, newPassword) {
 
 ---
 
-## 🔄 Data Flow
+## Data Flow
 
 ### Creating a Note
 
@@ -584,7 +601,7 @@ User edits note and clicks "Save"
 
 ---
 
-## 🎯 Event Handling
+## Event Handling
 
 ### Event Delegation Example
 
@@ -640,7 +657,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 ### Sign Up Flow
 
@@ -689,7 +706,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 💾 Storage Strategy
+## Storage Strategy
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -732,7 +749,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🎨 Theming System
+## Theming System
 
 ### CSS Custom Properties (Design Tokens)
 
@@ -773,7 +790,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 📱 Responsive Design
+## Responsive Design
 
 ### Breakpoints
 
@@ -810,7 +827,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🚀 Setup & Installation
+## Setup & Installation
 
 ### Prerequisites
 
@@ -849,7 +866,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## ✅ Lab Requirements Coverage
+## Lab Requirements Coverage
 
 ### DOM Manipulation (25%)
 
@@ -905,7 +922,7 @@ function handleKeyboardNav(e) {
 | Responsive design   | ✅ Mobile, Tablet, Desktop     |
 | Focus management    | ✅ Modal focus trap            |
 
-### Bonus Features ⭐
+### Bonus Features 
 
 | Feature               | Implementation                   |
 | --------------------- | -------------------------------- |
@@ -916,7 +933,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🎤 Lab Defense Preparation
+## Lab Defense Preparation
 
 ### Key Points to Mention
 
@@ -957,13 +974,13 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Illona Addae**  
 AmaliTech - Module Lab Project
 
 ---
 
-## 📄 License
+## License
 
 This project is for educational purposes as part of the AmaliTech training program.
