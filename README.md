@@ -916,46 +916,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🎤 Lab Defense Preparation
 
-### Key Points to Mention
-
-1. **"Why Appwrite instead of just localStorage?"**
-
-   - Real-world applications need cloud databases
-   - Data persists across devices
-   - Demonstrates understanding of backend integration
-   - Shows initiative beyond basic requirements
-
-2. **"How does event delegation work?"**
-
-   - Instead of attaching listeners to each element, we attach ONE listener to the parent
-   - Events "bubble up" from child to parent
-   - More efficient (less memory) and works for dynamically added elements
-   - Example: `notesList.addEventListener('click', ...)` handles all note cards
-
-3. **"Explain the module architecture"**
-
-   - Each module has a single responsibility
-   - `appwrite.js` - database operations only
-   - `ui.js` - DOM manipulation only
-   - `noteManager.js` - data logic only
-   - `main.js` - orchestrates everything
-
-4. **"How does the theme system work?"**
-
-   - CSS custom properties for all colors/spacing
-   - JavaScript sets `data-theme` attribute on `<html>`
-   - CSS uses `[data-theme="dark"]` selectors
-   - Preferences saved to localStorage
-
-5. **"What's the difference between localStorage and sessionStorage?"**
-   - localStorage: persists forever
-   - sessionStorage: cleared when tab closes
-   - We use localStorage for preferences (permanent)
-   - We use sessionStorage for draft auto-save (temporary)
-
----
 
 ##  Author
 
