@@ -1,4 +1,4 @@
-# 📝 Note-Taking Web App
+#  Note-Taking Web App
 
 A modern, full-featured note-taking application built with **vanilla JavaScript (ES6 Modules)** and **Appwrite Cloud** backend. This project demonstrates advanced DOM manipulation, event handling, browser storage APIs, and cloud database integration.
 
@@ -6,7 +6,7 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Features](#-features)
 2. [Tech Stack](#-tech-stack)
@@ -25,7 +25,7 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ---
 
-## ✨ Features
+##  Features
 
 ### Core Features
 
@@ -48,7 +48,7 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 | Layer              | Technology                            |
 | ------------------ | ------------------------------------- |
@@ -61,7 +61,7 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ---
 
-## 🏗 Project Architecture
+##  Project Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -106,7 +106,7 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ---
 
-## 📁 File Structure
+##  File Structure
 
 ```
 note-taking-web-app/
