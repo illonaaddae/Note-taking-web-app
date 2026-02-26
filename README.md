@@ -689,7 +689,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 💾 Storage Strategy
+##  Storage Strategy
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
