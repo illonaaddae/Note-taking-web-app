@@ -170,10 +170,10 @@ Appwrite is a **Backend-as-a-Service (BaaS)** platform that provides:
 ```javascript
 // scripts/appwrite.js
 const CONFIG = {
-  endpoint: "https://fra.cloud.appwrite.io/v1", // Appwrite server
-  projectId: "69430f2d001f367e2aca", // Our project ID
-  databaseId: "notesdb", // Database name
-  collectionId: "notes", // Collection (table) name
+  endpoint: "https://fra.cloud.appwrite.io/v1",
+  projectId: "", // Our project ID
+  databaseId: "", // Database name
+  collectionId: "", // Collection (table) name
 };
 ```
 
