@@ -29,22 +29,22 @@ A modern, full-featured note-taking application built with **vanilla JavaScript 
 
 ### Core Features
 
-- ✅ **CRUD Operations** - Create, Read, Update, Delete notes
-- ✅ **Archive System** - Archive/unarchive notes
-- ✅ **Tag System** - Organize notes with tags, filter by tag
-- ✅ **Search** - Real-time search by title, content, and tags
-- ✅ **Theme Switching** - Light, Dark, and System-auto themes
-- ✅ **Font Customization** - Sans-serif, Serif, Monospace fonts
+-  **CRUD Operations** - Create, Read, Update, Delete notes
+-  **Archive System** - Archive/unarchive notes
+-  **Tag System** - Organize notes with tags, filter by tag
+-  **Search** - Real-time search by title, content, and tags
+-  **Theme Switching** - Light, Dark, and System-auto themes
+-  **Font Customization** - Sans-serif, Serif, Monospace fonts
 
 ### Advanced Features
 
-- ✅ **Cloud Database** - Appwrite backend (data persists across devices)
-- ✅ **User Authentication** - Sign up, Login, Logout
-- ✅ **Google OAuth** - One-click Google sign-in
-- ✅ **Password Recovery** - Forgot password & reset flow
-- ✅ **Auto-save Drafts** - sessionStorage for unsaved work
-- ✅ **Keyboard Navigation** - Full keyboard accessibility
-- ✅ **Responsive Design** - Mobile, Tablet, Desktop layouts
+-  **Cloud Database** - Appwrite backend (data persists across devices)
+-  **User Authentication** - Sign up, Login, Logout
+-  **Google OAuth** - One-click Google sign-in
+-  **Password Recovery** - Forgot password & reset flow
+-  **Auto-save Drafts** - sessionStorage for unsaved work
+-  **Keyboard Navigation** - Full keyboard accessibility
+-  **Responsive Design** - Mobile, Tablet, Desktop layouts
 
 ---
 
@@ -122,23 +122,23 @@ note-taking-web-app/
 │   └── reset-password.html # Reset password page
 │
 ├── scripts/                # JavaScript modules
-│   ├── main.js             # 🎯 App entry point, event handlers
-│   ├── appwrite.js         # 🌐 Appwrite database operations
-│   ├── noteManager.js      # 📝 Note data manipulation (pure functions)
-│   ├── ui.js               # 🖼️ DOM rendering functions
-│   ├── theme.js            # 🎨 Theme & font switching
-│   ├── storage.js          # 💾 localStorage & sessionStorage
-│   ├── settings.js         # ⚙️ Settings page logic
-│   ├── utils.js            # 🔧 Helper utilities
+│   ├── main.js             #  App entry point, event handlers
+│   ├── appwrite.js         #  Appwrite database operations
+│   ├── noteManager.js      #  Note data manipulation (pure functions)
+│   ├── ui.js               #  DOM rendering functions
+│   ├── theme.js            #  Theme & font switching
+│   ├── storage.js          #  localStorage & sessionStorage
+│   ├── settings.js         #  Settings page logic
+│   ├── utils.js            #  Helper utilities
 │   └── auth/               # Auth-specific modules
 │       ├── index.js        # Auth pages entry point
-│       ├── authService.js  # 🔐 Appwrite authentication
+│       ├── authService.js  #  Appwrite authentication
 │       ├── formHandlers.js # Form submission handlers
 │       ├── validation.js   # Form validation logic
 │       └── passwordToggle.js # Password visibility toggle
 │
 ├── styles/                 # CSS stylesheets
-│   ├── tokens.css          # 🎨 Design tokens (colors, spacing, etc.)
+│   ├── tokens.css          #  Design tokens (colors, spacing, etc.)
 │   ├── base.css            # Base/reset styles
 │   ├── components.css      # Reusable component styles
 │   ├── dashboard.css       # Dashboard-specific styles
@@ -153,7 +153,7 @@ note-taking-web-app/
 
 ---
 
-## 🌐 Appwrite Integration
+##  Appwrite Integration
 
 ### What is Appwrite?
 
@@ -292,7 +292,7 @@ export async function deleteNote(noteId) {
 
 ---
 
-## 📦 Module Breakdown
+##  Module Breakdown
 
 ### 1. `main.js` - Application Entry Point
 
@@ -319,11 +319,11 @@ let currentView = "all-notes"; // Current view state
 
 ```javascript
 // Instead of adding listeners to each note card:
-// ❌ noteCard1.addEventListener('click', ...)
-// ❌ noteCard2.addEventListener('click', ...)
+//  noteCard1.addEventListener('click', ...)
+//  noteCard2.addEventListener('click', ...)
 
 // We add ONE listener to the parent container:
-// ✅ notesList.addEventListener('click', handleNoteClick)
+//  notesList.addEventListener('click', handleNoteClick)
 
 const notesList = document.getElementById("notes-list");
 notesList?.addEventListener("click", handleNoteClick);
@@ -524,7 +524,7 @@ export async function resetPassword(userId, secret, newPassword) {
 
 ---
 
-## 🔄 Data Flow
+##  Data Flow
 
 ### Creating a Note
 
@@ -584,7 +584,7 @@ User edits note and clicks "Save"
 
 ---
 
-## 🎯 Event Handling
+##  Event Handling
 
 ### Event Delegation Example
 
@@ -640,7 +640,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🔐 Authentication Flow
+##  Authentication Flow
 
 ### Sign Up Flow
 
@@ -732,7 +732,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🎨 Theming System
+##  Theming System
 
 ### CSS Custom Properties (Design Tokens)
 
@@ -773,7 +773,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 📱 Responsive Design
+##  Responsive Design
 
 ### Breakpoints
 
@@ -810,7 +810,7 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 🚀 Setup & Installation
+##  Setup & Installation
 
 ### Prerequisites
 
@@ -849,70 +849,70 @@ function handleKeyboardNav(e) {
 
 ---
 
-## ✅ Lab Requirements Coverage
+##  Lab Requirements Coverage
 
 ### DOM Manipulation (25%)
 
 | Requirement                 | Implementation                              | File  |
 | --------------------------- | ------------------------------------------- | ----- |
-| Create elements dynamically | ✅ `createNoteCard()`                       | ui.js |
-| Append to DOM               | ✅ `renderAllNotes()`                       | ui.js |
-| Update DOM in real-time     | ✅ `showNoteDetail()`                       | ui.js |
-| Remove elements             | ✅ `renderAllNotes()` clears and re-renders | ui.js |
+| Create elements dynamically |  `createNoteCard()`                       | ui.js |
+| Append to DOM               |  `renderAllNotes()`                       | ui.js |
+| Update DOM in real-time     |  `showNoteDetail()`                       | ui.js |
+| Remove elements             |  `renderAllNotes()` clears and re-renders | ui.js |
 
 ### Event Handling (25%)
 
 | Requirement         | Implementation           | File                          |
 | ------------------- | ------------------------ | ----------------------------- |
-| Click events        | ✅ All buttons and cards | main.js                       |
-| Input events        | ✅ Search, form fields   | main.js                       |
-| Submit events       | ✅ Forms                 | main.js, auth/formHandlers.js |
-| Event delegation    | ✅ Notes list, tags list | main.js                       |
-| Keyboard navigation | ✅ Escape, Enter, Arrows | main.js                       |
+| Click events        |  All buttons and cards | main.js                       |
+| Input events        |  Search, form fields   | main.js                       |
+| Submit events       |  Forms                 | main.js, auth/formHandlers.js |
+| Event delegation    |  Notes list, tags list | main.js                       |
+| Keyboard navigation |  Escape, Enter, Arrows | main.js                       |
 
 ### Browser APIs (20%)
 
 | Requirement    | Implementation               | File                |
 | -------------- | ---------------------------- | ------------------- |
-| localStorage   | ✅ Preferences               | storage.js          |
-| sessionStorage | ✅ Draft auto-save           | storage.js, main.js |
-| Additional API | ✅ Appwrite (cloud database) | appwrite.js         |
+| localStorage   |  Preferences               | storage.js          |
+| sessionStorage |  Draft auto-save           | storage.js, main.js |
+| Additional API |  Appwrite (cloud database) | appwrite.js         |
 
 ### Code Organization (15%)
 
 | Requirement            | Implementation                              |
 | ---------------------- | ------------------------------------------- |
-| ES6 Modules            | ✅ All files use import/export              |
-| Separation of concerns | ✅ Distinct modules for each responsibility |
-| Reusable functions     | ✅ Pure functions in noteManager.js         |
+| ES6 Modules            |  All files use import/export              |
+| Separation of concerns |  Distinct modules for each responsibility |
+| Reusable functions     |  Pure functions in noteManager.js         |
 
 ### Interactive Features (10%)
 
 | Requirement     | Implementation               |
 | --------------- | ---------------------------- |
-| CRUD operations | ✅ Full implementation       |
-| Archive system  | ✅ Toggle archive status     |
-| Tag system      | ✅ Add, filter, display tags |
-| Search          | ✅ Real-time search          |
-| Themes          | ✅ Light, Dark, System       |
+| CRUD operations |  Full implementation       |
+| Archive system  |  Toggle archive status     |
+| Tag system      |  Add, filter, display tags |
+| Search          |  Real-time search          |
+| Themes          |  Light, Dark, System       |
 
 ### Accessibility & Responsiveness (5%)
 
 | Requirement         | Implementation                 |
 | ------------------- | ------------------------------ |
-| Keyboard navigation | ✅ Full keyboard support       |
-| ARIA labels         | ✅ On all interactive elements |
-| Responsive design   | ✅ Mobile, Tablet, Desktop     |
-| Focus management    | ✅ Modal focus trap            |
+| Keyboard navigation |  Full keyboard support       |
+| ARIA labels         |  On all interactive elements |
+| Responsive design   |  Mobile, Tablet, Desktop     |
+| Focus management    |  Modal focus trap            |
 
-### Bonus Features ⭐
+### Bonus Features 
 
 | Feature               | Implementation                   |
 | --------------------- | -------------------------------- |
-| Cloud Database        | ✅ Appwrite integration          |
-| User Authentication   | ✅ Email/Password + Google OAuth |
-| Password Recovery     | ✅ Forgot/Reset password flow    |
-| Dark Mode Auto-detect | ✅ `prefers-color-scheme`        |
+| Cloud Database        |  Appwrite integration          |
+| User Authentication   |  Email/Password + Google OAuth |
+| Password Recovery     |  Forgot/Reset password flow    |
+| Dark Mode Auto-detect |  `prefers-color-scheme`        |
 
 ---
 
@@ -957,13 +957,13 @@ function handleKeyboardNav(e) {
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Illona Addae**  
 AmaliTech - Module Lab Project
 
 ---
 
-## 📄 License
+##  License
 
 This project is for educational purposes as part of the AmaliTech training program.
