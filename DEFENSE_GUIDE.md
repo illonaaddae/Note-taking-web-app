@@ -1,4 +1,4 @@
-# 🎤 Lab Defense Quick Reference Guide
+#  Lab Defense Quick Reference Guide
 
 ## Project Overview (30-second pitch)
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 🔑 Key Technical Concepts to Explain
+##  Key Technical Concepts to Explain
 
 ### 1. Event Delegation (They WILL ask this!)
 
@@ -16,12 +16,12 @@ Instead of adding event listeners to every single element, we add ONE listener t
 **Code Example:**
 
 ```javascript
-// ❌ BAD: Adding listener to each note (inefficient, breaks for new notes)
+//  BAD: Adding listener to each note (inefficient, breaks for new notes)
 noteCard1.addEventListener("click", handleClick);
 noteCard2.addEventListener("click", handleClick);
 noteCard3.addEventListener("click", handleClick);
 
-// ✅ GOOD: One listener on parent container
+//  GOOD: One listener on parent container
 const notesList = document.getElementById("notes-list");
 notesList.addEventListener("click", (e) => {
   const noteCard = e.target.closest(".note-card");
@@ -215,16 +215,16 @@ document.addEventListener("keydown", (e) => {
 
 ---
 
-## 📊 Requirements Checklist
+##  Requirements Checklist
 
-### DOM Manipulation (25%) ✅
+### DOM Manipulation (25%) 
 
 - [x] Create elements: `ui.js - createNoteCard()`
 - [x] Update elements: `ui.js - showNoteDetail()`
 - [x] Delete elements: `ui.js - renderAllNotes()` clears first
 - [x] Read from DOM: `main.js - handleSaveNote()` reads inputs
 
-### Event Handling (25%) ✅
+### Event Handling (25%) 
 
 - [x] Click events: Buttons, cards, tags
 - [x] Input events: Search field
@@ -232,19 +232,19 @@ document.addEventListener("keydown", (e) => {
 - [x] Event delegation: Notes list, tags list
 - [x] Keyboard events: Escape, Enter, Arrows
 
-### Browser APIs (20%) ✅
+### Browser APIs (20%) 
 
 - [x] localStorage: Theme/font preferences
 - [x] sessionStorage: Draft auto-save
 - [x] Additional API: Appwrite cloud database
 
-### Code Organization (15%) ✅
+### Code Organization (15%) 
 
 - [x] ES6 modules: All files
 - [x] Import/export: Proper syntax
 - [x] Separation of concerns: Each module has single responsibility
 
-### Interactive Features (10%) ✅
+### Interactive Features (10%) 
 
 - [x] CRUD: Create, Read, Update, Delete
 - [x] Archive: Toggle archive status
@@ -252,7 +252,7 @@ document.addEventListener("keydown", (e) => {
 - [x] Search: Real-time filtering
 - [x] Themes: Light, Dark, System
 
-### Accessibility (5%) ✅
+### Accessibility (5%) 
 
 - [x] Keyboard navigation: Full support
 - [x] ARIA labels: On buttons
@@ -260,7 +260,7 @@ document.addEventListener("keydown", (e) => {
 
 ---
 
-## 🎯 Potential Questions & Answers
+##  Potential Questions & Answers
 
 ### Q: "Walk me through what happens when a user creates a note"
 
@@ -323,7 +323,7 @@ User always sees friendly error messages, while we log technical details."
 
 ---
 
-## 💡 Pro Tips for Your Defense
+##  Pro Tips for Your Defense
 
 1. **Start with the big picture** - Explain architecture before diving into code
 2. **Use diagrams** - Draw the data flow on whiteboard if needed
@@ -334,7 +334,7 @@ User always sees friendly error messages, while we log technical details."
 
 ---
 
-## 🚀 Quick Demo Flow
+##  Quick Demo Flow
 
 1. **Show responsive design** - Resize browser
 2. **Create a note** - Demonstrate CRUD
@@ -345,4 +345,4 @@ User always sees friendly error messages, while we log technical details."
 7. **Show authentication** - Login, logout
 8. **Mention Google OAuth** - Click button to show flow
 
-Good luck with your defense! 🎉
+Good luck with your defense! 
