@@ -845,7 +845,7 @@ function handleKeyboardNav(e) {
 ### Appwrite Console Access
 
 - URL: https://cloud.appwrite.io
-- Project: Notes App (ID: 69430f2d001f367e2aca)
+
 
 ---
 
