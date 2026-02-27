@@ -1,4 +1,8 @@
+# Note-Taking Web App
 # Note-Taking Web App | Full-Featured Notes App
+=======
+# Note-Taking Web App | Shared Features Branch
+>>>>>>> feature/conflict-demo-2
 
 A modern, full-featured note-taking application built with **vanilla JavaScript (ES6 Modules)** and **Appwrite Cloud** backend. This project demonstrates advanced DOM manipulation, event handling, browser storage APIs, and cloud database integration.
 
