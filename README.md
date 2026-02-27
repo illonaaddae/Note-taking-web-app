@@ -1,4 +1,4 @@
-#  Note-Taking Web App
+# Note-Taking Web App — Production Branch
 
 A modern, full-featured note-taking application built with **vanilla JavaScript (ES6 Modules)** and **Appwrite Cloud** backend. This project demonstrates advanced DOM manipulation, event handling, browser storage APIs, and cloud database integration.
 
