@@ -142,10 +142,119 @@ async function init() {
  * Set up all event listeners
  */
 function setupEventListeners() {
+  // Share note button
+  const shareNoteBtn = document.getElementById("share-note-btn");
+  shareNoteBtn?.addEventListener("click", handleShareNote);
+}
+
+/**
+ * Handle share note: generate shareable link and copy to clipboard
+ */
+function handleShareNote() {
+  const noteId = ui.getCurrentNoteId();
+  if (!noteId) {
+    ui.showToast("No note selected to share.", "error");
+    return;
+  }
+  // Generate shareable link (assume shared.html?note=ID)
+  const shareUrl = `${
+    window.location.origin
+  }/shared.html?note=${encodeURIComponent(noteId)}`;
+  // Copy to clipboard
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareUrl).then(
+      () => {
+        ui.showToast("Shareable link copied to clipboard!", "success");
+      },
+      () => {
+        ui.showToast("Failed to copy link.", "error");
+      }
+    );
+  } else {
+    // Fallback for older browsers
+    const tempInput = document.createElement("input");
+    tempInput.value = shareUrl;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    try {
+      document.execCommand("copy");
+      ui.showToast("Shareable link copied to clipboard!", "success");
+    } catch {
+      ui.showToast("Failed to copy link.", "error");
+    }
+    document.body.removeChild(tempInput);
+  }
+  // Rich Text Formatting Toolbar
+  setupRichTextToolbar();
+  // End of setupEventListeners
+
+  /**
+   * Set up rich text formatting toolbar for note editor
+   */
+  function setupRichTextToolbar() {
+    const toolbar = document.getElementById("note-toolbar");
+    const editor = document.getElementById("note-content");
+    if (!toolbar || !editor) return;
+
+    // Helper to update active state on toolbar buttons
+    function updateToolbarActive() {
+      toolbar.querySelectorAll(".toolbar-btn").forEach((btn) => {
+        const command = btn.getAttribute("data-command");
+        let isActive = false;
+        try {
+          if (command === "bold") isActive = document.queryCommandState("bold");
+          if (command === "italic")
+            isActive = document.queryCommandState("italic");
+          if (command === "underline")
+            isActive = document.queryCommandState("underline");
+          if (command === "insertUnorderedList")
+            isActive = document.queryCommandState("insertUnorderedList");
+          if (command === "insertOrderedList")
+            isActive = document.queryCommandState("insertOrderedList");
+        } catch {}
+        btn.classList.toggle("active", !!isActive);
+      });
+    }
+
+    // Update toolbar on selection change and input
+    editor.addEventListener("keyup", updateToolbarActive);
+    editor.addEventListener("mouseup", updateToolbarActive);
+    editor.addEventListener("input", updateToolbarActive);
+    document.addEventListener("selectionchange", () => {
+      if (document.activeElement === editor) updateToolbarActive();
+    });
+
+    toolbar.querySelectorAll(".toolbar-btn").forEach((btn) => {
+      btn.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // Prevent losing focus
+        const command = btn.getAttribute("data-command");
+        if (command) {
+          document.execCommand(command, false, null);
+          editor.focus();
+          updateToolbarActive();
+        }
+      });
+    });
+
+    // Placeholder logic for contenteditable
+    function togglePlaceholder() {
+      if (editor.innerHTML === "" || editor.innerHTML === "<br>") {
+        editor.classList.add("empty");
+      } else {
+        editor.classList.remove("empty");
+      }
+    }
+    togglePlaceholder();
+    editor.addEventListener("input", togglePlaceholder);
+    editor.addEventListener("blur", togglePlaceholder);
+    // Initial toolbar state
+    updateToolbarActive();
+  }
+  // ...existing code...
+
   // Create new note button
   const createNoteBtn = document.getElementById("create-note-btn");
   const fabCreateNote = document.getElementById("fab-create-note");
-
   createNoteBtn?.addEventListener("click", handleCreateNote);
   fabCreateNote?.addEventListener("click", handleCreateNote);
 
@@ -244,6 +353,29 @@ function setupEventListeners() {
  * Set up tags selector (Mac Notes style checkboxes)
  */
 function setupTagsSelector() {
+  // Helper to open/close tags dropdown
+  function toggleTagsDropdown() {
+    const tagsSelector = document.getElementById("tags-selector");
+    const tagsDropdown = document.getElementById("tags-dropdown");
+    if (!tagsDropdown) return;
+    tagsDropdown.classList.toggle("open");
+    if (tagsDropdown.classList.contains("open")) {
+      tagsDropdown.style.display = "block";
+      tagsSelector?.classList.add("active");
+    } else {
+      tagsDropdown.style.display = "none";
+      tagsSelector?.classList.remove("active");
+    }
+  }
+
+  function closeTagsDropdown() {
+    const tagsSelector = document.getElementById("tags-selector");
+    const tagsDropdown = document.getElementById("tags-dropdown");
+    if (!tagsDropdown) return;
+    tagsDropdown.classList.remove("open");
+    tagsDropdown.style.display = "none";
+    tagsSelector?.classList.remove("active");
+  }
   const tagsSelected = document.getElementById("tags-selected");
   const tagsDropdown = document.getElementById("tags-dropdown");
   const tagsSearchInput = document.getElementById("tags-search-input");
@@ -310,92 +442,22 @@ function setupTagsSelector() {
   });
 }
 
-/**
- * Toggle tags dropdown visibility
- */
-function toggleTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
-  const isHidden = tagsDropdown?.classList.contains("hidden");
-
-  if (isHidden) {
-    openTagsDropdown();
-  } else {
-    closeTagsDropdown();
-  }
-}
-
-/**
- * Open tags dropdown
- */
-function openTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
-  const tagsSearchInput = document.getElementById("tags-search-input");
-
-  tagsDropdown?.classList.remove("hidden");
-  renderTagsDropdown();
-  tagsSearchInput?.focus();
-}
-
-/**
- * Close tags dropdown
- */
-function closeTagsDropdown() {
-  const tagsDropdown = document.getElementById("tags-dropdown");
-  tagsDropdown?.classList.add("hidden");
-}
-
-/**
- * Render tags dropdown with checkboxes
- */
-function renderTagsDropdown(filterQuery = "") {
-  const tagsDropdownList = document.getElementById("tags-dropdown-list");
-  if (!tagsDropdownList) return;
-
-  // Get all unique tags from notes cache
-  const allTags = noteManager.getAllTags(notesCache);
-
-  // Get currently selected tags for this note
-  const selectedTags = getSelectedTags();
-
-  // Filter tags if there's a search query
-  const filteredTags = filterQuery
-    ? allTags.filter((tag) =>
-        tag.toLowerCase().includes(filterQuery.toLowerCase())
-      )
-    : allTags;
-
-  if (filteredTags.length === 0 && !filterQuery) {
-    tagsDropdownList.innerHTML = `
-      <div class="tags-dropdown-empty">
-        No tags yet. Create your first tag!
-      </div>
-    `;
-    return;
-  }
-
-  if (filteredTags.length === 0 && filterQuery) {
-    tagsDropdownList.innerHTML = `
-      <div class="tags-dropdown-empty">
-        No matching tags. Press Enter to create "${filterQuery}".
-      </div>
-    `;
-    return;
-  }
-
-  tagsDropdownList.innerHTML = filteredTags
-    .map((tag) => {
-      const isSelected = selectedTags.includes(tag);
-      return `
-        <div class="tags-dropdown-item ${
-          isSelected ? "selected" : ""
-        }" data-tag="${tag}">
-          <span class="tag-checkbox"></span>
-          <span class="tag-name">${tag}</span>
-        </div>
-      `;
-    })
-    .join("");
-}
+// ...existing code...
+// The following rendering logic should be inside a function, e.g. renderTagsDropdown. Ensure only valid JS and template literals are used.
+// Example (move this to a function if not already):
+// function renderTagsDropdown(filterQuery = "") {
+//   if (filteredTags.length === 0 && filterQuery) {
+//     tagsDropdownList.innerHTML = `<div class="tags-dropdown-empty">No matching tags. Press Enter to create "${filterQuery}".</div>`;
+//     return;
+//   }
+//   tagsDropdownList.innerHTML = filteredTags
+//     .map((tag) => {
+//       const isSelected = selectedTags.includes(tag);
+//       return `<div class="tags-dropdown-item ${isSelected ? "selected" : ""}" data-tag="${tag}"><span class="tag-checkbox"></span><span class="tag-name">${tag}</span></div>`;
+//     })
+//     .join("");
+// }
+// Remove any stray HTML outside of template literals.
 
 /**
  * Filter tags dropdown based on search query
@@ -568,7 +630,7 @@ async function handleSaveNote() {
   }
 
   const title = document.getElementById("note-title")?.textContent || "";
-  const content = document.getElementById("note-content")?.value || "";
+  const content = document.getElementById("note-content")?.innerHTML || "";
   const tagsText = document.getElementById("note-tags")?.value || "";
   const tags = tagsText
     .split(",")

@@ -83,6 +83,23 @@ export function renderAllNotes(notes) {
   }
 
   notesList.innerHTML = filteredNotes.map(renderNoteCard).join("");
+  // Re-attach click event delegation for note cards
+  notesList.querySelectorAll(".note-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (window.getSelection && window.getSelection().toString()) return;
+      const noteId = card.dataset.noteId;
+      if (!noteId) return;
+      const note = notes.find((n) => n.id === noteId);
+      if (note) {
+        showNoteDetail(note);
+        setActiveNote(noteId);
+        if (typeof ui !== "undefined" && ui.updateArchiveButton)
+          ui.updateArchiveButton(note.archived);
+        const noteDetailSection = document.getElementById("note-detail");
+        noteDetailSection?.classList.add("active");
+      }
+    });
+  });
 }
 
 /**
@@ -103,7 +120,14 @@ export function showNoteDetail(note) {
   // Set title - trim whitespace and use empty string for CSS :empty placeholder to show
   const displayTitle = note.title?.trim() || "";
   if (titleEl) titleEl.textContent = displayTitle;
-  if (contentEl) contentEl.value = note.content || "";
+  if (contentEl) {
+    let content = note.content || "";
+    // If content does not contain any HTML tags, treat as legacy plain text and convert line breaks to <br>
+    if (!/[<>]/.test(content)) {
+      content = content.replace(/\n/g, "<br>");
+    }
+    contentEl.innerHTML = content;
+  }
 
   // Update hidden tags input
   if (tagsEl) tagsEl.value = note.tags.join(", ") || "";
